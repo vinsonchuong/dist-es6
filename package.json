@@ -1,0 +1,28 @@
+{
+  "name": "dist-es6",
+  "version": "0.0.1",
+  "description": "Utilities to support development of npm packages in ES6+",
+  "keywords": ["es6"],
+  "homepage": "https://github.com/vinsonchuong/dist-es6",
+  "bugs": "https://github.com/vinsonchuong/dist-es6/issues",
+  "license": "MIT",
+  "author": "Vinson Chuong <vinsonchuong@gmail.com>",
+  "bin": {
+    "dist-es6": "src/bin/dist-es6.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vinsonchuong/dist-es6"
+  },
+  "devDependencies": {
+    "babel": "^5.4.7",
+    "eslint-defaults": "^0.0.2",
+    "jasmine-es6": "^0.0.3"
+  },
+  "dependencies": {
+    "babel-runtime": "^5.4.7"
+  },
+  "scripts": {
+    "test": "eslint && jasmine"
+  }
+}
