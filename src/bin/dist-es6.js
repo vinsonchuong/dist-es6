@@ -2,6 +2,13 @@
 var fs = require('fs');
 var path = require('path');
 
+function readJson(jsonPath, callback) {
+  fs.readFile(path.resolve(jsonPath), 'utf8', function(error, contents) {
+    if (error) { throw error; }
+    callback(JSON.parse(contents));
+  });
+}
+
 function linkPackage(packagePath, packageName) {
   fs.symlink(
     path.resolve(packagePath),
@@ -21,13 +28,6 @@ function linkPackage(packagePath, packageName) {
           }
         );
       });
-  });
-}
-
-function readJson(jsonPath, callback) {
-  fs.readFile(path.resolve(jsonPath), 'utf8', function(error, contents) {
-    if (error) { throw error; }
-    callback(JSON.parse(contents));
   });
 }
 
