@@ -76,6 +76,45 @@ describe('Directory', function() {
     });
   });
 
+  describe('writing child files', function() {
+    beforeEach(async function() {
+      const projectDirectory = new Directory();
+      await projectDirectory.mkdir('directory');
+    });
+
+    afterEach(async function() {
+      await rimraf(path.resolve('directory'));
+    });
+
+    it('creates a file with the given name and contents if a child file with the given name does not already exist', async function() {
+      const directory = new Directory('directory');
+      await directory.writeFile('child-file', 'text');
+      expect(await directory.readFile('child-file')).toBe('text');
+    });
+
+    it('overwrites any existing file with the same name', async function() {
+      const directory = new Directory('directory');
+      await directory.writeFile('child-file', 'text');
+      await directory.writeFile('child-file', 'other text');
+      expect(await directory.readFile('child-file')).toBe('other text');
+    });
+
+    it('overwrites any existing symlink with the same name', async function() {
+      const directory = new Directory('directory');
+      await directory.symlink('node_modules', 'child-file');
+      await directory.writeFile('child-file', 'text');
+      expect(await directory.readFile('child-file')).toBe('text');
+    });
+
+    it('overwrites any existing directory with the same name', async function() {
+      const directory = new Directory('directory');
+      const childDirectory = await directory.mkdir('child');
+      await childDirectory.writeFile('grandchild', 'some text');
+      await directory.writeFile('child', 'text');
+      expect(await directory.readFile('child')).toBe('text');
+    });
+  });
+
   describe('creating symlinks', function() {
     beforeEach(async function() {
       const projectDirectory = new Directory();

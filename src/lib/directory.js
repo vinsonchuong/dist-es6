@@ -16,6 +16,12 @@ export default class Directory {
       contents;
   }
 
+  async writeFile(childFileName, contents) {
+    const childFilePath = path.join(this.path, childFileName);
+    await rimraf(childFilePath);
+    await fs.writeFile(childFilePath, contents);
+  }
+
   async mkdir(childDirectoryName) {
     try {
       await fs.mkdir(path.join(this.path, childDirectoryName));
