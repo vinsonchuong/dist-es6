@@ -9,6 +9,10 @@ export default class Directory {
     fs.readdirSync(this.path);
   }
 
+  join(...joinPaths) {
+    return path.join(this.path, ...joinPaths);
+  }
+
   async execSh(command) {
     const child = await exec(command, {cwd: this.path});
     return child.stdout.trim();
@@ -23,15 +27,14 @@ export default class Directory {
   }
 
   async readFile(childFileName) {
-    const contents = await fs.readFile(
-      path.join(this.path, childFileName), 'utf8');
+    const contents = await fs.readFile(this.join(childFileName), 'utf8');
     return path.extname(childFileName) === '.json' ?
       JSON.parse(contents) :
       contents;
   }
 
   async writeFile(childFileName, contents) {
-    const childFilePath = path.join(this.path, childFileName);
+    const childFilePath = this.join(childFileName);
     const childFileContents = (
       typeof contents === 'object' ? JSON.stringify(contents) :
       contents
@@ -42,7 +45,7 @@ export default class Directory {
 
   async mkdir(childDirectoryName) {
     try {
-      await fs.mkdir(path.join(this.path, childDirectoryName));
+      await fs.mkdir(this.join(childDirectoryName));
     } catch (e) {
       if (e.code !== 'EEXIST') {
         throw e;
@@ -52,11 +55,11 @@ export default class Directory {
   }
 
   async rm(childName = '') {
-    await rimraf(path.join(this.path, childName));
+    await rimraf(this.join(childName));
   }
 
   async symlink(sourcePath, name) {
-    const destinationPath = path.resolve(this.path, name);
+    const destinationPath = this.join(name);
     await rimraf(destinationPath);
     await fs.symlink(path.resolve(sourcePath), destinationPath);
   }
