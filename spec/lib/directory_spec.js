@@ -158,4 +158,38 @@ describe('Directory', function() {
         .toBe(path.resolve('node_modules'));
     });
   });
+
+  describe('removing files and directories', function() {
+    beforeEach(async function() {
+      const projectDirectory = new Directory();
+      await projectDirectory.mkdir('directory');
+    });
+
+    afterEach(async function() {
+      await rimraf(path.resolve('directory'));
+    });
+
+    it('removes the directory passed to the constructor by default', async function() {
+      const directory = new Directory('directory');
+      await directory.rm();
+      expect(await fs.readdir(path.resolve())).not.toContain('directory');
+    });
+
+    it('can remove a child file', async function() {
+      const directory = new Directory('directory');
+      await directory.writeFile('child-file');
+      await directory.rm('child-file');
+      expect(await fs.readdir(path.resolve('directory')))
+        .not.toContain('child-file');
+    });
+
+    it('can remove a child directory', async function() {
+      const directory = new Directory('directory');
+      const childDirectory = await directory.mkdir('child-directory');
+      childDirectory.writeFile('grandchild', 'text');
+      await directory.rm('child-directory');
+      expect(await fs.readdir(path.resolve('directory')))
+        .not.toContain('child-directory');
+    });
+  });
 });

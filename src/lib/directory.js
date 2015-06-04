@@ -33,6 +33,10 @@ export default class Directory {
     return new Directory(this.path, childDirectoryName);
   }
 
+  async rm(childName = '') {
+    await rimraf(path.join(this.path, childName));
+  }
+
   async symlink(sourcePath, name) {
     const destinationPath = path.resolve(this.path, name);
     await rimraf(destinationPath);
