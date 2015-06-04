@@ -92,6 +92,13 @@ describe('Directory', function() {
       expect(await directory.readFile('child-file')).toBe('text');
     });
 
+    it('writes JSON if given an object', async function() {
+      const directory = new Directory('directory');
+      await directory.writeFile('child-file.json', {key: 'value'});
+      expect(await directory.readFile('child-file.json'))
+        .toEqual({key: 'value'});
+    });
+
     it('overwrites any existing file with the same name', async function() {
       const directory = new Directory('directory');
       await directory.writeFile('child-file', 'text');

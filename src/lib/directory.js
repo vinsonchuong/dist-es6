@@ -18,8 +18,12 @@ export default class Directory {
 
   async writeFile(childFileName, contents) {
     const childFilePath = path.join(this.path, childFileName);
+    const childFileContents = (
+      typeof contents === 'object' ? JSON.stringify(contents) :
+      contents
+    );
     await rimraf(childFilePath);
-    await fs.writeFile(childFilePath, contents);
+    await fs.writeFile(childFilePath, childFileContents);
   }
 
   async mkdir(childDirectoryName) {
