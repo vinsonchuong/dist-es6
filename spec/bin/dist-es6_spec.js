@@ -80,4 +80,38 @@ describe('dist-es6', function() {
     expect(await fixture.script('link-bin-2')).toBe('link-bin-2');
     expect(await fixture.script('project-bin')).toBe('project-bin');
   });
+
+  xit('replaces files and directories that already exist', async function() {
+    const linkDependency = new Fixture({
+      name: 'link-dependency',
+      bin: {
+        'link-bin': 'link-bin.js'
+      }
+    });
+    await linkDependency.install();
+
+    const fixture = new Fixture({
+      name: 'project',
+      bin: {
+        'project-bin': 'project-bin.js'
+      },
+      scripts: {
+        prepublish: 'dist-es6',
+        'link-bin': 'link-bin',
+        'project-bin': 'project-bin'
+      },
+      linkDependencies: {
+        'link-dependency': linkDependency.path
+      }
+    });
+    await fixture.link('.');
+    await fixture.install();
+
+    await linkDependency.install();
+    await fixture.install();
+
+    expect(await fixture.script('link-bin-1')).toBe('link-bin-1');
+    expect(await fixture.script('link-bin-2')).toBe('link-bin-2');
+    expect(await fixture.script('project-bin')).toBe('project-bin');
+  });
 });
