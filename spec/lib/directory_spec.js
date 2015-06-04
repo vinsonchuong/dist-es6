@@ -40,6 +40,13 @@ describe('Directory', function() {
       expect(await fs.readdir(childDirectoryPath))
         .toEqual(childDirectoryContents);
     });
+
+    it('still returns an instance of Directory if a child directory with the same name already exists', async function() {
+      const directory = new Directory();
+      const childDirectory = await directory.mkdir('node_modules');
+      expect(childDirectory.path).toBe(path.resolve('node_modules'));
+      expect(childDirectory instanceof Directory).toBe(true);
+    });
   });
 
   describe('reading child files', function() {

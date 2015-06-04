@@ -19,12 +19,12 @@ export default class Directory {
   async mkdir(childDirectoryName) {
     try {
       await fs.mkdir(path.join(this.path, childDirectoryName));
-      return new Directory(this.path, childDirectoryName);
     } catch (e) {
       if (e.code !== 'EEXIST') {
         throw e;
       }
     }
+    return new Directory(this.path, childDirectoryName);
   }
 
   async symlink(sourcePath, name) {
