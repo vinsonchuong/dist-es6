@@ -9,6 +9,11 @@ export default class Directory {
     fs.readdirSync(this.path);
   }
 
+  async execSh(command) {
+    const child = await exec(command, {cwd: this.path});
+    return child.stdout.trim();
+  }
+
   async execNode(code) {
     const child = await exec(`node -e 'console.log(eval(process.env.code))'`, {
       cwd: this.path,

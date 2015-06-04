@@ -200,6 +200,21 @@ describe('Directory', function() {
     });
   });
 
+  describe('executing shell commands', function() {
+    beforeEach(async function() {
+      await new Directory().mkdir('directory');
+    });
+
+    afterEach(async function() {
+      await new Directory().rm('directory');
+    });
+
+    it('executes the command from the given directory', async function() {
+      const directory = new Directory('directory');
+      expect(await directory.execSh('pwd')).toBe(directory.path);
+    });
+  });
+
   describe('executing JavaScript in node', function() {
     beforeEach(async function() {
       await new Directory().mkdir('directory');
