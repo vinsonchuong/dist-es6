@@ -199,4 +199,19 @@ describe('Directory', function() {
         .not.toContain('child-directory');
     });
   });
+
+  describe('executing JavaScript in node', function() {
+    beforeEach(async function() {
+      await new Directory().mkdir('directory');
+    });
+
+    afterEach(async function() {
+      await new Directory().rm('directory');
+    });
+
+    it('executes node from the given directory', async function() {
+      const directory = new Directory('directory');
+      expect(await directory.execNode('process.cwd()')).toBe(directory.path);
+    });
+  });
 });

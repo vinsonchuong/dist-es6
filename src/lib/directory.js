@@ -1,11 +1,20 @@
 import path from 'path';
 import fs from 'fs-promise';
+import {exec} from 'child-process-promise';
 import rimraf from 'rimraf-promise';
 
 export default class Directory {
   constructor(...directoryPath) {
     this.path = path.resolve(...directoryPath);
     fs.readdirSync(this.path);
+  }
+
+  async execNode(code) {
+    const child = await exec(`node -e 'console.log(eval(process.env.code))'`, {
+      cwd: this.path,
+      env: {code}
+    });
+    return child.stdout.trim();
   }
 
   async readFile(childFileName) {
