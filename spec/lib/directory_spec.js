@@ -107,6 +107,7 @@ describe('Directory', function() {
         .toEqual({key: 'value'});
     });
 
+    // TODO: Increase timeout
     it('overwrites any existing file with the same name', async function() {
       const directory = new Directory('directory');
       await directory.writeFile('child-file', 'text');
@@ -164,6 +165,7 @@ describe('Directory', function() {
         .toBe(path.resolve('node_modules'));
     });
 
+    // TODO: Increase timeout
     it('overwrites any existing directory with the same name', async function() {
       const directory = new Directory('directory');
       await fs.mkdir(directory.join('child'));

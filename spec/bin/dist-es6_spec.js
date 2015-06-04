@@ -48,6 +48,7 @@ describe('dist-es6', function() {
       .toBe(path.join(linkDependency2.path, 'index.js'));
   });
 
+  // TODO: Increase timeout
   it('links bins provided by the current package and its linkDependencies', async function() {
     const linkDependency = new Fixture({
       name: 'link-dependency',
