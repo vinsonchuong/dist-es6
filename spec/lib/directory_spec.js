@@ -16,7 +16,7 @@ describe('Directory', function() {
 
   describe('creating child directories', function() {
     afterEach(async function() {
-      await rimraf(path.resolve('child-directory'));
+      await new Directory().rm('child-directory');
     });
 
     it('creates a child directory if one with the same name does not already exist', async function() {
@@ -56,7 +56,7 @@ describe('Directory', function() {
     });
 
     afterEach(async function() {
-      await rimraf(path.resolve('child-directory'));
+      await new Directory().rm('child-directory');
     });
 
     it('returns the text of the child file', async function() {
@@ -83,7 +83,7 @@ describe('Directory', function() {
     });
 
     afterEach(async function() {
-      await rimraf(path.resolve('directory'));
+      await new Directory().rm('directory');
     });
 
     it('creates a file with the given name and contents if a child file with the given name does not already exist', async function() {
@@ -122,7 +122,7 @@ describe('Directory', function() {
     });
 
     afterEach(async function() {
-      await rimraf(path.resolve('directory'));
+      await new Directory().rm('directory');
     });
 
     it('creates a symlink with the given name if a child file with the given name does not already exist', async function() {
