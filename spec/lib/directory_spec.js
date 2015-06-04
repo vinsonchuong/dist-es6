@@ -208,6 +208,23 @@ describe('Directory', function() {
     });
   });
 
+  describe('making files executable', function() {
+    beforeEach(async function() {
+      await new Directory().mkdir('directory');
+    });
+
+    afterEach(async function() {
+      await new Directory().rm('directory');
+    });
+
+    it('updates sets the permissions of a file', async function() {
+      const directory = new Directory('directory');
+      await directory.writeFile('script', '#!/bin/sh\necho running in sh');
+      await directory.chmod('script', '755');
+      expect(await directory.execSh('./script')).toBe('running in sh');
+    });
+  });
+
   describe('executing shell commands', function() {
     beforeEach(async function() {
       await new Directory().mkdir('directory');

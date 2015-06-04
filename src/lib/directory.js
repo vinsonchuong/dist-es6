@@ -26,6 +26,10 @@ export default class Directory {
     return child.stdout.trim();
   }
 
+  async chmod(childFileName, mode) {
+    return await fs.chmod(this.join(childFileName), mode);
+  }
+
   async readFile(childFileName) {
     const contents = await fs.readFile(this.join(childFileName), 'utf8');
     return path.extname(childFileName) === '.json' ?
