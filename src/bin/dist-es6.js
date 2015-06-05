@@ -6,7 +6,6 @@ import Project from '../lib/project';
 
   await project.link('.');
 
-  const packageJson = await project.packageJson();
   const {linkDependencies = {}} = await project.packageJson();
   for (const name of Object.keys(linkDependencies)) {
     await project.link(path.resolve(linkDependencies[name]));
