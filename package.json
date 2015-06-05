@@ -15,11 +15,11 @@
     "url": "https://github.com/vinsonchuong/dist-es6"
   },
   "devDependencies": {
-    "babel": "^5.4.7",
     "eslint-defaults": "^0.0.2",
     "jasmine-es6": "^0.0.3"
   },
   "dependencies": {
+    "babel": "^5.4.7",
     "babel-runtime": "^5.4.7",
     "fs-promise": "^0.3.1",
     "child-process-promise": "^1.1.0",

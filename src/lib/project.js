@@ -1,5 +1,14 @@
 import Directory from './directory';
 
+const babelRegisterPath = require.resolve('babel/register');
+function babelAdapter(jsFilePath) {
+  return `#!/usr/bin/env node
+'use strict';
+require('${babelRegisterPath}');
+module.exports = require('${jsFilePath}');
+`;
+}
+
 export default class Project {
   constructor(...projectPath) {
     this.directory = new Directory(...projectPath);
@@ -14,14 +23,20 @@ export default class Project {
     const packageJson = await packageDir.readFile('package.json');
 
     const nodeModules = await this.directory.mkdir('node_modules');
-    await nodeModules.symlink(packagePath, packageJson.name);
+
+    const linkedPackageDir = await nodeModules.mkdir(packageJson.name);
+    await linkedPackageDir.writeFile(
+      'index.js',
+      babelAdapter(packageDir.path)
+    );
 
     const bin = await nodeModules.mkdir('.bin');
     for (const binName of Object.keys(Object(packageJson.bin))) {
-      await bin.symlink(
-        packageDir.join(packageJson.bin[binName]),
-        binName
+      await bin.writeFile(
+        binName,
+        babelAdapter(packageDir.join(packageJson.bin[binName]))
       );
+      await bin.chmod(binName, '755');
     }
   }
 }
