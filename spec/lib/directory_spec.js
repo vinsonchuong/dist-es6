@@ -57,6 +57,13 @@ describe('Directory', function() {
     });
   });
 
+  describe('listing the contents of the directory', function() {
+    it('lists every child file', async function() {
+      expect(await new Directory().ls())
+        .toEqual(await fs.readdir(path.resolve()));
+    });
+  });
+
   describe('reading child files', function() {
     beforeEach(async function() {
       const directory = new Directory();

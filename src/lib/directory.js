@@ -30,6 +30,10 @@ export default class Directory {
     return await fs.chmod(this.join(childFileName), mode);
   }
 
+  async ls() {
+    return await fs.readdir(this.path);
+  }
+
   async readFile(childFileName) {
     const contents = await fs.readFile(this.join(childFileName), 'utf8');
     return path.extname(childFileName) === '.json' ?
