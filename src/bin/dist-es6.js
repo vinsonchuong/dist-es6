@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs-promise';
 import Project from '../lib/project';
 
-(async () => {
+async function run() {
   const project = new Project();
   const packageJson = await project.packageJson();
 
@@ -43,4 +43,6 @@ import Project from '../lib/project';
     await fs.writeFile(binPath, '#!/usr/bin/env node\n' + binContents);
     await fs.chmod(binPath, '755');
   }
-})();
+}
+
+run().catch(e => console.log(e.stack));
