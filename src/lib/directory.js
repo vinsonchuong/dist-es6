@@ -1,7 +1,6 @@
 import path from 'path';
 import fs from 'fs-promise';
 import {exec} from 'child-process-promise';
-import rimraf from 'rimraf-promise';
 
 export default class Directory {
   constructor(...directoryPath) {
@@ -47,7 +46,7 @@ export default class Directory {
       typeof contents === 'object' ? JSON.stringify(contents) :
       contents
     );
-    await rimraf(childFilePath);
+    await fs.remove(childFilePath);
     await fs.writeFile(childFilePath, childFileContents);
   }
 
@@ -63,12 +62,12 @@ export default class Directory {
   }
 
   async rm(childName = '') {
-    await rimraf(this.join(childName));
+    await fs.remove(this.join(childName));
   }
 
   async symlink(sourcePath, name) {
     const destinationPath = this.join(name);
-    await rimraf(destinationPath);
+    await fs.remove(destinationPath);
     await fs.symlink(path.resolve(sourcePath), destinationPath);
   }
 }

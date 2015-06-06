@@ -7,6 +7,7 @@
   "bugs": "https://github.com/vinsonchuong/dist-es6/issues",
   "license": "MIT",
   "author": "Vinson Chuong <vinsonchuong@gmail.com>",
+  "files": ["LICENSE", "README.md", "src"],
   "bin": {
     "dist-es6": "src/bin/dist-es6.js"
   },
@@ -14,18 +15,18 @@
     "type": "git",
     "url": "https://github.com/vinsonchuong/dist-es6"
   },
+  "scripts": {
+    "test": "eslint && jasmine"
+  },
+  "dependencies": {
+    "babel": "^5.5.4",
+    "babel-runtime": "^5.5.4",
+    "fs-promise": "^0.3.1",
+    "fs-extra": "^0.18.4",
+    "child-process-promise": "^1.1.0"
+  },
   "devDependencies": {
     "eslint-defaults": "^0.0.2",
     "jasmine-es6": "^0.0.4"
-  },
-  "dependencies": {
-    "babel": "^5.5.3",
-    "babel-runtime": "^5.5.3",
-    "fs-promise": "^0.3.1",
-    "child-process-promise": "^1.1.0",
-    "rimraf-promise": "^1.0.0"
-  },
-  "scripts": {
-    "test": "eslint && jasmine"
   }
 }

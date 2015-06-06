@@ -1,6 +1,5 @@
 import path from 'path';
 import fs from 'fs-promise';
-import rimraf from 'rimraf-promise';
 import Directory from '../../src/lib/directory';
 
 import install from 'jasmine-es6';
@@ -185,12 +184,11 @@ describe('Directory', function() {
 
   describe('removing files and directories', function() {
     beforeEach(async function() {
-      const projectDirectory = new Directory();
-      await projectDirectory.mkdir('directory');
+      await new Directory().mkdir('directory');
     });
 
     afterEach(async function() {
-      await rimraf(path.resolve('directory'));
+      await new Directory().rm('directory');
     });
 
     it('removes the directory passed to the constructor by default', async function() {
