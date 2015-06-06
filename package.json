@@ -16,6 +16,7 @@
     "url": "https://github.com/vinsonchuong/dist-es6"
   },
   "scripts": {
+    "prepublish": "babel-node src/bin/dist-es6.js",
     "test": "eslint && jasmine"
   },
   "dependencies": {
