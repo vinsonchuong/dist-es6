@@ -73,7 +73,7 @@ describe('Project', function() {
       expect(output.split('\n').slice(-1)[0]).toBe('linked-bin');
     });
 
-    it('can link packages containing ES6 code', async function() {
+    it('can link packages containing ES6 executables', async function() {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
         name: 'project',
@@ -92,19 +92,12 @@ describe('Project', function() {
         }
       });
       await linkedDirectory.writeFile(
-        'index.js',
-        `export default 'linked code'`
-      );
-      await linkedDirectory.writeFile(
         'bin-file.js',
         `const {name} = {name: 'linked-bin'}; console.log(name)`
       );
 
       const project = new Project(projectDirectory.path);
       await project.link(linkedDirectory.path);
-
-      expect(await projectDirectory.execNode(`require('linked')`))
-        .toBe('linked code');
 
       const output = await projectDirectory.execSh(`npm run linked-bin`);
       expect(output.split('\n').slice(-1)[0]).toBe('linked-bin');

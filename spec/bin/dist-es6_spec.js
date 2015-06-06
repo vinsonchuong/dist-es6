@@ -30,7 +30,7 @@ describe('dist-es6', function() {
       'index.js',
       `module.exports = 'project main'`
     );
-    await project.link('.');
+    await project.link('dist');
     await project.directory.execSh('npm install');
 
     expect(await project.directory.execNode(`require('project')`))
@@ -63,7 +63,7 @@ describe('dist-es6', function() {
       'index.js',
       `module.exports = require('link-dependency')`
     );
-    await project.link('.');
+    await project.link('dist');
     await project.directory.execSh('npm install');
 
     expect(await project.directory.execNode(`require('project')`))
@@ -85,7 +85,7 @@ describe('dist-es6', function() {
       'main.js',
       `export default 'main'`
     );
-    await project.link('.');
+    await project.link('dist');
     await project.directory.execSh('npm install');
 
     expect(await project.directory.execNode(`require('./dist')`))
@@ -114,7 +114,7 @@ describe('dist-es6', function() {
       'bin-file.js',
       `console.log('bin text')`
     );
-    await project.link('.');
+    await project.link('dist');
     await project.directory.execSh('npm install');
 
     const distDirectory = await project.directory.mkdir('dist');
@@ -141,7 +141,7 @@ describe('dist-es6', function() {
     );
     await project.directory.writeFile('README.md', '# Project');
     await project.directory.writeFile('.travis.yml', '---');
-    await project.link('.');
+    await project.link('dist');
     await project.directory.execSh('npm install');
 
     const distDirectory = await project.directory.mkdir('dist');
@@ -166,7 +166,7 @@ describe('dist-es6', function() {
       'main.js',
       `export default 'main'`
     );
-    await project.link('.');
+    await project.link('dist');
 
     const distDirectory = await project.directory.mkdir('dist');
     await distDirectory.writeFile('extra-file', 'extra text');

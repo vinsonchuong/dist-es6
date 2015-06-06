@@ -5,7 +5,7 @@ function babelAdapter(jsFilePath) {
   return `#!/usr/bin/env node
 'use strict';
 require('${babelRegisterPath}');
-module.exports = require('${jsFilePath}');
+require('${jsFilePath}');
 `;
 }
 
@@ -23,12 +23,7 @@ export default class Project {
     const packageJson = await packageDir.readFile('package.json');
 
     const nodeModules = await this.directory.mkdir('node_modules');
-
-    const linkedPackageDir = await nodeModules.mkdir(packageJson.name);
-    await linkedPackageDir.writeFile(
-      'index.js',
-      babelAdapter(packageDir.path)
-    );
+    await nodeModules.symlink(packageDir.path, packageJson.name);
 
     const bin = await nodeModules.mkdir('.bin');
     for (const binName of Object.keys(Object(packageJson.bin))) {
