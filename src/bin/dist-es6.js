@@ -45,4 +45,4 @@ async function run() {
   }
 }
 
-run().catch(e => console.log(e.stack));
+run().catch(e => process.stderr.write(e.stack + '\n'));
