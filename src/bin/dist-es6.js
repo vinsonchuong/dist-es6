@@ -17,6 +17,7 @@ import Project from '../lib/project';
   const distDirectory = await project.directory.mkdir('dist');
   const distPackageJson = Object.assign({}, packageJson, {
     main: packageJson.main && packageJson.main.replace(/^src\//, ''),
+    files: undefined,
     bin: packageJson.bin && Object.keys(packageJson.bin)
       .reduce(
         (memo, binName) => Object.assign(memo, {
