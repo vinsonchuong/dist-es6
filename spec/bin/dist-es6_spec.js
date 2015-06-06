@@ -69,4 +69,110 @@ describe('dist-es6', function() {
     expect(await project.directory.execNode(`require('project')`))
       .toBe('link dependency main');
   });
+
+  it('compiles JS from the src directory to the dist directory', async function() {
+    const project = new Project('project');
+    await project.directory.writeFile('package.json', {
+      name: 'project',
+      private: true,
+      main: 'src/main.js',
+      scripts: {
+        prepublish: 'dist-es6'
+      }
+    });
+    const srcDirectory = await project.directory.mkdir('src');
+    await srcDirectory.writeFile(
+      'main.js',
+      `export default 'main'`
+    );
+    await project.link('.');
+    await project.directory.execSh('npm install');
+
+    expect(await project.directory.execNode(`require('./dist')`))
+      .toBe('main');
+  });
+
+  it('maps executables correctly', async function() {
+    const project = new Project('project');
+    await project.directory.writeFile('package.json', {
+      name: 'project',
+      private: true,
+      main: 'src/main.js',
+      bin: {
+        'bin-name': 'src/bin-file.js'
+      },
+      scripts: {
+        prepublish: 'dist-es6'
+      }
+    });
+    const srcDirectory = await project.directory.mkdir('src');
+    await srcDirectory.writeFile(
+      'main.js',
+      `export default 'main'`
+    );
+    await srcDirectory.writeFile(
+      'bin-file.js',
+      `console.log('bin text')`
+    );
+    await project.link('.');
+    await project.directory.execSh('npm install');
+
+    const distDirectory = await project.directory.mkdir('dist');
+    const {bin: binConfig} = await distDirectory.readFile('package.json');
+    expect(binConfig).toEqual({'bin-name': 'bin-file.js'});
+    expect(await distDirectory.execSh('./bin-file.js')).toBe('bin text');
+  });
+
+  it('adds other whitelisted files to dist', async function() {
+    const project = new Project('project');
+    await project.directory.writeFile('package.json', {
+      name: 'project',
+      private: true,
+      files: ['src', 'README.md'],
+      main: 'src/main.js',
+      scripts: {
+        prepublish: 'dist-es6'
+      }
+    });
+    const srcDirectory = await project.directory.mkdir('src');
+    await srcDirectory.writeFile(
+      'main.js',
+      `export default 'main'`
+    );
+    await project.directory.writeFile('README.md', '# Project');
+    await project.directory.writeFile('.travis.yml', '---');
+    await project.link('.');
+    await project.directory.execSh('npm install');
+
+    const distDirectory = await project.directory.mkdir('dist');
+    const distDirectoryFiles = await distDirectory.ls();
+    expect(await distDirectory.readFile('README.md')).toBe('# Project');
+    expect(distDirectoryFiles.sort())
+      .toEqual(['README.md', 'main.js', 'package.json'].sort());
+  });
+
+  it('clears the dist directory before compilation', async function() {
+    const project = new Project('project');
+    await project.directory.writeFile('package.json', {
+      name: 'project',
+      private: true,
+      main: 'src/main.js',
+      scripts: {
+        prepublish: 'dist-es6'
+      }
+    });
+    const srcDirectory = await project.directory.mkdir('src');
+    await srcDirectory.writeFile(
+      'main.js',
+      `export default 'main'`
+    );
+    await project.link('.');
+
+    const distDirectory = await project.directory.mkdir('dist');
+    await distDirectory.writeFile('extra-file', 'extra text');
+
+    await project.directory.execSh('npm install');
+    const distDirectoryFiles = await distDirectory.ls();
+    expect(distDirectoryFiles).not.toContain('extra-file');
+  });
 });
