@@ -17,6 +17,7 @@ async function run() {
   const distDirectory = await project.directory.mkdir('dist');
   const distPackageJson = Object.assign({}, packageJson, {
     main: packageJson.main && packageJson.main.replace(/^src\//, ''),
+    private: undefined,
     files: undefined,
     bin: packageJson.bin && Object.keys(packageJson.bin)
       .reduce(

@@ -175,4 +175,34 @@ describe('dist-es6', function() {
     const distDirectoryFiles = await distDirectory.ls();
     expect(distDirectoryFiles).not.toContain('extra-file');
   });
+
+  it('removes unnecessary keys from the package.json', async function() {
+    const project = new Project('project');
+    await project.directory.writeFile('package.json', {
+      name: 'project',
+      private: true,
+      files: ['src', 'README.md'],
+      main: 'src/main.js',
+      scripts: {
+        prepublish: 'dist-es6'
+      }
+    });
+    await project.directory.writeFile('README.md', '# Project');
+
+    const srcDirectory = await project.directory.mkdir('src');
+    await srcDirectory.writeFile(
+      'main.js',
+      `export default 'main'`
+    );
+
+    await project.link('dist');
+    await project.directory.execSh('npm install');
+
+    const distDirectory = await project.directory.mkdir('dist');
+    expect(await distDirectory.readFile('package.json')).toEqual({
+      name: 'project',
+      main: 'main.js',
+      scripts: {}
+    });
+  });
 });
