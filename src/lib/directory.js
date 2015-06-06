@@ -50,6 +50,10 @@ export default class Directory {
     await fs.writeFile(childFilePath, childFileContents);
   }
 
+  async cp(sourcePath, name) {
+    await fs.copy(path.resolve(sourcePath), this.join(name));
+  }
+
   async mkdir(childDirectoryName) {
     try {
       await fs.mkdir(this.join(childDirectoryName));

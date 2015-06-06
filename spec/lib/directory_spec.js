@@ -92,8 +92,7 @@ describe('Directory', function() {
 
   describe('writing child files', function() {
     beforeEach(async function() {
-      const projectDirectory = new Directory();
-      await projectDirectory.mkdir('directory');
+      await new Directory().mkdir('directory');
     });
 
     afterEach(async function() {
@@ -134,6 +133,38 @@ describe('Directory', function() {
       await childDirectory.writeFile('grandchild', 'some text');
       await directory.writeFile('child', 'text');
       expect(await directory.readFile('child')).toBe('text');
+    });
+  });
+
+  describe('copying files and directories', function() {
+    beforeEach(async function() {
+      await new Directory().mkdir('from-directory');
+      await new Directory().mkdir('to-directory');
+    });
+
+    afterEach(async function() {
+      await new Directory().rm('from-directory');
+      await new Directory().rm('to-directory');
+    });
+
+    it('copies the source file into the destination directory as a child', async function() {
+      const fromDirectory = new Directory('from-directory');
+      await fromDirectory.writeFile('file', 'text');
+
+      const toDirectory = new Directory('to-directory');
+      await toDirectory.cp(fromDirectory.join('file'), 'file');
+      expect(await toDirectory.readFile('file')).toBe('text');
+    });
+
+    it('copies the source directory into the destination directory as a child', async function() {
+      const fromDirectory = new Directory('from-directory');
+      await fromDirectory.writeFile('file', 'text');
+
+      const toDirectory = new Directory('to-directory');
+      await toDirectory.cp(fromDirectory.path, 'copied-directory');
+
+      const copiedDirectory = await toDirectory.mkdir('copied-directory');
+      expect(await copiedDirectory.readFile('file')).toBe('text');
     });
   });
 
