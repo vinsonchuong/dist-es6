@@ -24,7 +24,10 @@ import Project from '../lib/project';
           [binName]: packageJson.bin[binName].replace(/^src\//, '')
         }),
         {}
-      )
+      ),
+    scripts: Object.assign({}, packageJson.scripts, {
+      prepublish: undefined
+    })
   });
   await distDirectory.writeFile('package.json', distPackageJson);
   await project.directory.execSh('babel src --out-dir dist');

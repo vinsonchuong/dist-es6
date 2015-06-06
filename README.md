@@ -64,6 +64,12 @@ must be whitelisted in the `files` field as follows:
 }
 ```
 
+Be sure to publish the `dist` directory instead of the project root directory:
+
+```sh
+npm publish dist
+```
+
 ## Development
 ### Getting Started
 The application requires the following external dependencies:
