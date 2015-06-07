@@ -31,7 +31,9 @@ async function run() {
     })
   });
   await distDirectory.writeFile('package.json', distPackageJson);
-  await project.directory.execSh('babel src --out-dir dist');
+  await project.directory.execSh(
+    `'${require.resolve('babel/bin/babel')}' src --out-dir dist`
+  );
   for (const fileName of packageJson.files || []) {
     if (fileName.indexOf('src') === 0) { continue; }
     await distDirectory.cp(fileName, fileName);
