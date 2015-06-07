@@ -1,5 +1,5 @@
 import path from 'path';
-import fs from 'fs-promise';
+import fs from 'node-promise-es6/fs';
 import Directory from '../../src/lib/directory';
 
 import install from 'jasmine-es6';

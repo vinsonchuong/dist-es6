@@ -1,6 +1,6 @@
 import path from 'path';
-import fs from 'fs-promise';
-import {exec} from 'child-process-promise';
+import fs from 'node-promise-es6/fs';
+import {exec} from 'node-promise-es6/child-process';
 
 export default class Directory {
   constructor(...directoryPath) {
