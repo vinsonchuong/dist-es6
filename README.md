@@ -89,6 +89,9 @@ must be whitelisted in the `files` field as follows:
 }
 ```
 
+Note that a dependency on the `babel-runtime` will be added to the compiled
+version of the package.
+
 Be sure to publish the `dist` directory instead of the project root directory:
 
 ```sh

@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'node-promise-es6/fs';
 import Project from '../lib/project';
+import PackageJson from '../lib/package-json';
 
 async function run() {
   const project = new Project();
@@ -15,31 +16,27 @@ async function run() {
 
   await project.directory.rm('dist');
   const distDirectory = await project.directory.mkdir('dist');
-  const distPackageJson = Object.assign({}, packageJson, {
-    main: packageJson.main && packageJson.main.replace(/^src\//, ''),
-    private: undefined,
-    files: undefined,
-    bin: packageJson.bin && Object.keys(packageJson.bin)
-      .reduce(
-        (memo, binName) => Object.assign(memo, {
-          [binName]: packageJson.bin[binName].replace(/^src\//, '')
-        }),
-        {}
-      ),
-    scripts: Object.assign({}, packageJson.scripts, {
-      prepublish: undefined
-    })
-  });
+
+  const distPackageJson = new PackageJson(packageJson)
+    .moveTo('src')
+    .toProduction()
+    .addBabelRuntime();
   await distDirectory.writeFile('package.json', distPackageJson);
-  await project.directory.execSh(
-    `'${require.resolve('babel/bin/babel')}' src --out-dir dist`
-  );
+
+  await project.directory.execSh([
+    `'${require.resolve('babel/bin/babel')}'`,
+    '--stage 0',
+    '--optional runtime',
+    'src',
+    '--out-dir dist'
+  ].join(' '));
+
   for (const fileName of packageJson.files || []) {
     if (fileName.indexOf('src') === 0) { continue; }
     await distDirectory.cp(fileName, fileName);
   }
 
-  const {bin: distBins = {}} = distPackageJson;
+  const {bin: distBins = {}} = distPackageJson.toJSON();
   for (const binName of Object.keys(distBins)) {
     const binPath = distDirectory.join(distBins[binName]);
     const binContents = await fs.readFile(binPath);

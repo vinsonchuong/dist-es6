@@ -70,7 +70,7 @@ describe('dist-es6', function() {
       .toBe('link dependency main');
   });
 
-  it('compiles JS from the src directory to the dist directory', async function() {
+  it('compiles ES6+ JS from the src directory to the dist directory', async function() {
     const project = new Project('project');
     await project.directory.writeFile('package.json', {
       name: 'project',
@@ -83,13 +83,28 @@ describe('dist-es6', function() {
     const srcDirectory = await project.directory.mkdir('src');
     await srcDirectory.writeFile(
       'main.js',
-      `export default 'main'`
+      `
+        const nums = [1, 2, 3];
+        export const x2 = [for (x of nums) 2 * x]
+        export async function fn() {}
+        export default 'main';
+      `
     );
     await project.link('dist');
     await project.directory.execSh('npm install');
 
-    expect(await project.directory.execNode(`require('./dist')`))
+    expect(await project.directory.execNode(`require('./dist').default`))
       .toBe('main');
+
+    const distDirectory = await project.directory.mkdir('dist');
+    expect(await distDirectory.readFile('main.js'))
+      .toContain('babel-runtime');
+    expect(await distDirectory.readFile('package.json'))
+      .toEqual(jasmine.objectContaining({
+        dependencies: {
+          'babel-runtime': jasmine.any(String)
+        }
+      }));
   });
 
   it('maps executables correctly', async function() {
@@ -202,7 +217,8 @@ describe('dist-es6', function() {
     expect(await distDirectory.readFile('package.json')).toEqual({
       name: 'project',
       main: 'main.js',
-      scripts: {}
+      scripts: {},
+      dependencies: jasmine.any(Object)
     });
   });
 });

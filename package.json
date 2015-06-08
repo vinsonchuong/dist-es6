@@ -17,7 +17,7 @@
   },
   "scripts": {
     "prepublish": "babel-node src/bin/dist-es6.js",
-    "test": "babel-node src/bin/dist-es6.js && eslint && jasmine"
+    "test": "eslint && babel-node src/bin/dist-es6.js && jasmine"
   },
   "dependencies": {
     "babel": "^5.5.4",
