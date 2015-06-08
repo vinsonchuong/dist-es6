@@ -77,7 +77,7 @@ describe('PackageJson', function() {
     });
   });
 
-  it('can return only the keys that are relevant for production', function() {
+  it('create a production version of the package.json', function() {
     const packageJson = new PackageJson({
       name: 'project',
       files: ['LICENSE', 'README.md', 'src'],
@@ -99,6 +99,7 @@ describe('PackageJson', function() {
         'project': 'src/bin/project.js'
       },
       scripts: {
+        prepublish: 'cd .. && npm install',
         test: 'eslint && jasmine'
       }
     });
