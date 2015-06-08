@@ -22,11 +22,13 @@ describe('dist-es6', function() {
     await project.directory.writeFile('package.json', {
       name: 'project',
       private: true,
+      main: 'src/index.js',
       scripts: {
         prepublish: 'dist-es6'
       }
     });
-    await project.directory.writeFile(
+    const srcDirectory = await project.directory.mkdir('src');
+    await srcDirectory.writeFile(
       'index.js',
       `module.exports = 'project main'`
     );
@@ -52,14 +54,16 @@ describe('dist-es6', function() {
     await project.directory.writeFile('package.json', {
       name: 'project',
       private: true,
-      linkDependencies: {
-        'link-dependency': linkDependency.directory.path
-      },
+      main: 'src/index.js',
       scripts: {
         prepublish: 'dist-es6'
+      },
+      linkDependencies: {
+        'link-dependency': linkDependency.directory.path
       }
     });
-    await project.directory.writeFile(
+    const srcDirectory = await project.directory.mkdir('src');
+    await srcDirectory.writeFile(
       'index.js',
       `module.exports = require('link-dependency')`
     );

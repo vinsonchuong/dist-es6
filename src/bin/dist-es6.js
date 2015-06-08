@@ -5,6 +5,13 @@ import PackageJson from '../lib/package-json';
 
 async function run() {
   const project = new Project();
+
+  const projectDirectoryContents = await project.directory.ls();
+  if (projectDirectoryContents.indexOf('src') === -1) {
+    process.stderr.write('No src directory found. Exiting.\n');
+    return;
+  }
+
   const packageJson = await project.packageJson();
 
   await project.link('.');
