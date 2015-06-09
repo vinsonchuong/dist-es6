@@ -52,4 +52,7 @@ async function run() {
   }
 }
 
-run().catch(e => process.stderr.write(e.stack + '\n'));
+run().catch(e => {
+  process.stderr.write(e.stack + '\n');
+  process.exit(1);
+});
