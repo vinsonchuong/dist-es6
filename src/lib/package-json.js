@@ -62,9 +62,7 @@ export default class PackageJson {
   toProduction() {
     return this.map({
       files: undefined,
-      scripts: (value, key) => key === 'prepublish' ?
-        'cd .. && npm install' :
-        value,
+      scripts: (value, key) => key === 'prepublish' ? undefined : value,
       private: undefined
     });
   }

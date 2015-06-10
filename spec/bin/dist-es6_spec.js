@@ -221,9 +221,7 @@ describe('dist-es6', function() {
     expect(await distDirectory.readFile('package.json')).toEqual({
       name: 'project',
       main: 'main.js',
-      scripts: {
-        prepublish: 'cd .. && npm install'
-      },
+      scripts: {},
       dependencies: jasmine.any(Object)
     });
   });
