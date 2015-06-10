@@ -92,31 +92,21 @@ must be whitelisted in the `files` field as follows:
 Note that a dependency on the `babel-runtime` will be added to the compiled
 version of the package.
 
-Be sure to publish the `dist` directory instead of the project root directory:
+To publish the compiled version of the package:
 
 ```sh
-npm publish dist
+npm publish
 ```
 
-To prevent accidental publishing of the ES6+ version of your package, add the
-`private` property to your `package.json`:
+The above will compile the package into the `dist` directory and run
+`npm publish` on the `dist` directory. Note that as an implementation detail,
+the command will return code `143`, which will probably cause deployment
+scripts to fail. You can either explicitly check the error code or run the
+following two commands instead:
 
-```json
-{
-  "name": "project",
-  "files": ["LICENSE", "README.md", "docs"],
-  "main": "src/index.js",
-  "bin": {
-    "project": "src/bin/project.js"
-  },
-  "scripts": {
-    "prepublish": "dist-es6"
-  },
-  "linkDependencies": {
-    "common-lib": "../common-lib"
-  },
-  "private": true
-}
+```sh
+npm install
+npm publish dist
 ```
 
 ## Development
