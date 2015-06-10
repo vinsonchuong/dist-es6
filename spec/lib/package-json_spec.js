@@ -88,8 +88,7 @@ describe('PackageJson', function() {
       scripts: {
         prepublish: 'dist-es6',
         test: 'eslint && jasmine'
-      },
-      private: true
+      }
     });
 
     expect(packageJson.toProduction().toJSON()).toEqual({

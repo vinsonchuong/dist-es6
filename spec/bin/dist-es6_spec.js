@@ -21,7 +21,6 @@ describe('dist-es6', function() {
     const project = new Project('project');
     await project.directory.writeFile('package.json', {
       name: 'project',
-      private: true,
       main: 'src/index.js',
       scripts: {
         prepublish: 'dist-es6'
@@ -42,8 +41,7 @@ describe('dist-es6', function() {
   it('enables linkDependencies to be imported by name', async function() {
     const linkDependency = new Project('link-dependency');
     await linkDependency.directory.writeFile('package.json', {
-      name: 'link-dependency',
-      private: true
+      name: 'link-dependency'
     });
     await linkDependency.directory.writeFile(
       'index.js',
@@ -53,7 +51,6 @@ describe('dist-es6', function() {
     const project = new Project('project');
     await project.directory.writeFile('package.json', {
       name: 'project',
-      private: true,
       main: 'src/index.js',
       scripts: {
         prepublish: 'dist-es6'
@@ -78,7 +75,6 @@ describe('dist-es6', function() {
     const project = new Project('project');
     await project.directory.writeFile('package.json', {
       name: 'project',
-      private: true,
       main: 'src/main.js',
       scripts: {
         prepublish: 'dist-es6'
@@ -115,7 +111,6 @@ describe('dist-es6', function() {
     const project = new Project('project');
     await project.directory.writeFile('package.json', {
       name: 'project',
-      private: true,
       main: 'src/main.js',
       bin: {
         'bin-name': 'src/bin-file.js'
@@ -146,7 +141,6 @@ describe('dist-es6', function() {
     const project = new Project('project');
     await project.directory.writeFile('package.json', {
       name: 'project',
-      private: true,
       files: ['src', 'README.md'],
       main: 'src/main.js',
       scripts: {
@@ -174,7 +168,6 @@ describe('dist-es6', function() {
     const project = new Project('project');
     await project.directory.writeFile('package.json', {
       name: 'project',
-      private: true,
       main: 'src/main.js',
       scripts: {
         prepublish: 'dist-es6'
@@ -199,7 +192,6 @@ describe('dist-es6', function() {
     const project = new Project('project');
     await project.directory.writeFile('package.json', {
       name: 'project',
-      private: true,
       files: ['src', 'README.md'],
       main: 'src/main.js',
       scripts: {

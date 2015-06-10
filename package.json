@@ -28,6 +28,5 @@
   "devDependencies": {
     "eslint-defaults": "^0.0.3",
     "jasmine-es6": "^0.0.4"
-  },
-  "private": true
+  }
 }
