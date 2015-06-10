@@ -37,7 +37,7 @@ describe('dist-es6', function() {
       `module.exports = 'lib code'`
     );
 
-    await project.link('dist');
+    await project.link('.', 'src');
     await project.directory.execSh('npm install');
 
     expect(await project.directory.execNode(`require('project')`))
@@ -72,7 +72,7 @@ describe('dist-es6', function() {
       'index.js',
       `module.exports = require('link-dependency')`
     );
-    await project.link('dist');
+    await project.link('.', 'src');
     await project.directory.execSh('npm install');
 
     expect(await project.directory.execNode(`require('project')`))
@@ -98,7 +98,7 @@ describe('dist-es6', function() {
         export default 'main';
       `
     );
-    await project.link('dist');
+    await project.link('.', 'src');
     await project.directory.execSh('npm install');
 
     expect(await project.directory.execNode(`require('./dist').default`))
@@ -136,7 +136,7 @@ describe('dist-es6', function() {
       'bin-file.js',
       `console.log('bin text')`
     );
-    await project.link('dist');
+    await project.link('.', 'src');
     await project.directory.execSh('npm install');
 
     const distDirectory = await project.directory.mkdir('dist');
@@ -166,7 +166,7 @@ describe('dist-es6', function() {
     );
     await project.directory.writeFile('README.md', '# Project');
     await project.directory.writeFile('.travis.yml', '---');
-    await project.link('dist');
+    await project.link('.', 'src');
     await project.directory.execSh('npm install');
 
     const distDirectory = await project.directory.mkdir('dist');
@@ -191,7 +191,7 @@ describe('dist-es6', function() {
       'main.js',
       `export default 'main'`
     );
-    await project.link('dist');
+    await project.link('.', 'src');
 
     const distDirectory = await project.directory.mkdir('dist');
     await distDirectory.writeFile('extra-file', 'extra text');
@@ -219,7 +219,7 @@ describe('dist-es6', function() {
       `export default 'main'`
     );
 
-    await project.link('dist');
+    await project.link('.', 'src');
     await project.directory.execSh('npm install');
 
     const distDirectory = await project.directory.mkdir('dist');

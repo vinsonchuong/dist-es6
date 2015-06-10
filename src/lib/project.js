@@ -1,4 +1,4 @@
-import Directory from './directory';
+import Directory from 'dist-es6/lib/directory';
 
 const babelRegisterPath = require.resolve('babel/register');
 function babelAdapter(jsFilePath) {

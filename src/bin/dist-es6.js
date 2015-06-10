@@ -1,8 +1,8 @@
 import path from 'path';
 import fs from 'node-promise-es6/fs';
 import posix from 'posix';
-import Project from '../lib/project';
-import PackageJson from '../lib/package-json';
+import Project from 'dist-es6/lib/project';
+import PackageJson from 'dist-es6/lib/package-json';
 
 async function linkLocalPackages(project) {
   const {linkDependencies = {}} = await project.packageJson();

@@ -17,7 +17,7 @@
   },
   "scripts": {
     "prepublish": "babel-node --stage 0 src/bin/dist-es6.js",
-    "test": "eslint && dist-es6 && jasmine"
+    "test": "eslint && jasmine"
   },
   "dependencies": {
     "babel": "^5.5.4",
