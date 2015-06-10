@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'node-promise-es6/fs';
-import {exec} from 'node-promise-es6/child-process';
+import posix from 'posix';
 import Project from '../lib/project';
 import PackageJson from '../lib/package-json';
 
@@ -81,10 +81,7 @@ async function run() {
   if (currentNpmCommand === 'publish') {
     const output = await project.directory.execSh('npm publish dist');
     process.stdout.write(`${output}\n`);
-
-    const ppid = (await exec('ps -p ' + process.pid + ' -o ppid='))
-      .stdout.trim();
-    process.kill(ppid);
+    process.kill(posix.getppid());
   }
 }
 
