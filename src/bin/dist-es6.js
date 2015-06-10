@@ -3,32 +3,22 @@ import fs from 'node-promise-es6/fs';
 import Project from '../lib/project';
 import PackageJson from '../lib/package-json';
 
-async function run() {
-  const project = new Project();
+async function linkLocalPackages(project) {
+  const {linkDependencies = {}} = await project.packageJson();
+  await* [
+    project.link('.'),
+    ...Object.keys(linkDependencies)
+      .map(name => path.resolve(linkDependencies[name]))
+      .map(linkDependencyPath => project.link(linkDependencyPath))
+  ];
+}
 
+async function compileJs(project) {
   const projectDirectoryContents = await project.directory.ls();
   if (projectDirectoryContents.indexOf('src') === -1) {
-    process.stderr.write('No src directory found. Exiting.\n');
+    process.stderr.write('No src directory found.\n');
     return;
   }
-
-  const packageJson = await project.packageJson();
-
-  await project.link('.');
-
-  const {linkDependencies = {}} = packageJson;
-  for (const name of Object.keys(linkDependencies)) {
-    await project.link(path.resolve(linkDependencies[name]));
-  }
-
-  await project.directory.rm('dist');
-  const distDirectory = await project.directory.mkdir('dist');
-
-  const distPackageJson = new PackageJson(packageJson)
-    .moveTo('src')
-    .toProduction()
-    .addBabelRuntime();
-  await distDirectory.writeFile('package.json', distPackageJson);
 
   await project.directory.execSh([
     `'${require.resolve('babel/bin/babel')}'`,
@@ -37,19 +27,54 @@ async function run() {
     'src',
     '--out-dir dist'
   ].join(' '));
+}
 
-  for (const fileName of packageJson.files || []) {
-    if (fileName.indexOf('src') === 0) { continue; }
-    await distDirectory.cp(fileName, fileName);
-  }
+async function compileExecutables(bins, distDirectory) {
+  await* Object.keys(bins)
+    .map(binName => distDirectory.join(bins[binName]))
+    .map(async binPath => {
+      const binContents = await fs.readFile(binPath);
+      await fs.writeFile(binPath, '#!/usr/bin/env node\n' + binContents);
+      await fs.chmod(binPath, '755');
+    });
+}
 
-  const {bin: distBins = {}} = distPackageJson.toJSON();
-  for (const binName of Object.keys(distBins)) {
-    const binPath = distDirectory.join(distBins[binName]);
-    const binContents = await fs.readFile(binPath);
-    await fs.writeFile(binPath, '#!/usr/bin/env node\n' + binContents);
-    await fs.chmod(binPath, '755');
-  }
+async function copyFiles(files, distDirectory) {
+  await* files
+    .filter(fileName => fileName.indexOf('src') !== 0)
+    .map(fileName => distDirectory.cp(fileName, fileName));
+}
+
+async function productionPackageJson(project) {
+  const packageJson = await project.packageJson();
+  return new PackageJson(packageJson)
+    .moveTo('src')
+    .toProduction()
+    .addBabelRuntime()
+    .toJSON();
+}
+
+async function compile(project) {
+  await project.directory.rm('dist');
+  const [packageJson, distDirectory, distPackageJson] = await* [
+    project.packageJson(),
+    project.directory.mkdir('dist'),
+    productionPackageJson(project),
+    compileJs(project)
+  ];
+  await* [
+    distDirectory.writeFile('package.json', distPackageJson),
+    copyFiles(packageJson.files || [], distDirectory),
+    compileExecutables(Object(distPackageJson.bin), distDirectory)
+  ];
+}
+
+async function run() {
+  const project = new Project();
+  await* [
+    linkLocalPackages(project),
+    compile(project)
+  ];
 }
 
 run().catch(e => {

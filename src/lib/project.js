@@ -15,23 +15,29 @@ export default class Project {
   }
 
   async packageJson() {
-    return await this.directory.readFile('package.json');
+    if (!this.cachedPackageJson) {
+      this.cachedPackageJson = await this.directory.readFile('package.json');
+    }
+    return this.cachedPackageJson;
   }
 
   async link(packagePath) {
     const packageDir = new Directory(packagePath);
-    const packageJson = await packageDir.readFile('package.json');
-
-    const nodeModules = await this.directory.mkdir('node_modules');
-    await nodeModules.symlink(packageDir.path, packageJson.name);
-
-    const bin = await nodeModules.mkdir('.bin');
-    for (const binName of Object.keys(Object(packageJson.bin))) {
-      await bin.writeFile(
-        binName,
-        babelAdapter(packageDir.join(packageJson.bin[binName]))
-      );
-      await bin.chmod(binName, '755');
-    }
+    const [packageJson, nodeModules] = await* [
+      packageDir.readFile('package.json'),
+      this.directory.mkdir('node_modules')
+    ];
+    const [bin] = await* [
+      await nodeModules.mkdir('.bin'),
+      nodeModules.symlink(packageDir.path, packageJson.name)
+    ];
+    await* Object.keys(Object(packageJson.bin))
+      .map(async binName => {
+        await bin.writeFile(
+          binName,
+          babelAdapter(packageDir.join(packageJson.bin[binName]))
+        );
+        await bin.chmod(binName, '755');
+      });
   }
 }
