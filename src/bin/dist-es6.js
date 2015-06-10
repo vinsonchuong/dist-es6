@@ -7,7 +7,7 @@ import PackageJson from '../lib/package-json';
 async function linkLocalPackages(project) {
   const {linkDependencies = {}} = await project.packageJson();
   await* [
-    project.link('.'),
+    project.link('.', 'src'),
     ...Object.keys(linkDependencies)
       .map(name => path.resolve(linkDependencies[name]))
       .map(linkDependencyPath => project.link(linkDependencyPath))
@@ -25,6 +25,7 @@ async function compileJs(project) {
     `'${require.resolve('babel/bin/babel')}'`,
     '--stage 0',
     '--optional runtime',
+    '--copy-files',
     'src',
     '--out-dir dist'
   ].join(' '));

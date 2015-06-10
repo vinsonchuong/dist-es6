@@ -51,6 +51,14 @@ directory. The `main` and `bin` fields must only refer to files inside of the
 Note that `dist-es6` will automatically add shebangs and executable
 permissions to any file listed in the `bin` field.
 
+Now, you'll be able to directly run executables from the current project on
+command line. You'll also be able to require files from the current project via
+module path instead of relative path:
+
+```js
+import code from 'project/lib/code';
+```
+
 Dependencies on local packages for development can be listed as follows:
 
 ```json

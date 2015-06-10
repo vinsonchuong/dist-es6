@@ -1,5 +1,5 @@
-import Directory from '../../src/lib/directory';
-import Project from '../../src/lib/project';
+import Directory from 'dist-es6/lib/directory';
+import Project from 'dist-es6/lib/project';
 
 import install from 'jasmine-es6';
 install();
@@ -31,11 +31,19 @@ describe('dist-es6', function() {
       'index.js',
       `module.exports = 'project main'`
     );
+    const libDirectory = await srcDirectory.mkdir('lib');
+    await libDirectory.writeFile(
+      'lib.js',
+      `module.exports = 'lib code'`
+    );
+
     await project.link('dist');
     await project.directory.execSh('npm install');
 
     expect(await project.directory.execNode(`require('project')`))
       .toBe('project main');
+    expect(await project.directory.execNode(`require('project/lib/lib')`))
+      .toBe('lib code');
   });
 
   it('enables linkDependencies to be imported by name', async function() {
@@ -152,6 +160,10 @@ describe('dist-es6', function() {
       'main.js',
       `export default 'main'`
     );
+    await srcDirectory.writeFile(
+      'config.json',
+      {foo: 'bar'}
+    );
     await project.directory.writeFile('README.md', '# Project');
     await project.directory.writeFile('.travis.yml', '---');
     await project.link('dist');
@@ -160,8 +172,9 @@ describe('dist-es6', function() {
     const distDirectory = await project.directory.mkdir('dist');
     const distDirectoryFiles = await distDirectory.ls();
     expect(await distDirectory.readFile('README.md')).toBe('# Project');
+    expect(await distDirectory.readFile('config.json')).toEqual({foo: 'bar'});
     expect(distDirectoryFiles.sort())
-      .toEqual(['README.md', 'main.js', 'package.json'].sort());
+      .toEqual(['README.md', 'main.js', 'package.json', 'config.json'].sort());
   });
 
   it('clears the dist directory before compilation', async function() {

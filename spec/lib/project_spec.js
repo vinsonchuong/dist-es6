@@ -1,5 +1,5 @@
-import Directory from '../../src/lib/directory';
-import Project from '../../src/lib/project';
+import Directory from 'dist-es6/lib/directory';
+import Project from 'dist-es6/lib/project';
 
 import install from 'jasmine-es6';
 install();
@@ -20,14 +20,12 @@ describe('Project', function() {
     it('links a package into a project', async function() {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
-        name: 'project',
-        private: true
+        name: 'project'
       });
 
       const linkedDirectory = await new Directory().mkdir('linked');
       await linkedDirectory.writeFile('package.json', {
-        name: 'linked',
-        private: true
+        name: 'linked'
       });
       linkedDirectory.writeFile(
         'index.js',
@@ -45,7 +43,6 @@ describe('Project', function() {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
         name: 'project',
-        private: true,
         scripts: {
           'linked-bin': 'bin-name'
         }
@@ -54,7 +51,6 @@ describe('Project', function() {
       const linkedDirectory = await new Directory().mkdir('linked');
       await linkedDirectory.writeFile('package.json', {
         name: 'linked',
-        private: true,
         bin: {
           'bin-name': 'bin-file.js'
         }
@@ -64,7 +60,6 @@ describe('Project', function() {
         'bin-file.js',
         `#!/usr/bin/env node\nconsole.log('linked-bin')`
       );
-      await linkedDirectory.chmod('bin-file.js', '755');
 
       const project = new Project(projectDirectory.path);
       await project.link(linkedDirectory.path);
@@ -77,7 +72,6 @@ describe('Project', function() {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
         name: 'project',
-        private: true,
         scripts: {
           'linked-bin': 'bin-name'
         }
@@ -86,7 +80,6 @@ describe('Project', function() {
       const linkedDirectory = await new Directory().mkdir('linked');
       await linkedDirectory.writeFile('package.json', {
         name: 'linked',
-        private: true,
         bin: {
           'bin-name': 'bin-file.js'
         }
@@ -98,6 +91,51 @@ describe('Project', function() {
 
       const project = new Project(projectDirectory.path);
       await project.link(linkedDirectory.path);
+
+      const output = await projectDirectory.execSh(`npm run linked-bin`);
+      expect(output.split('\n').slice(-1)[0]).toBe('linked-bin');
+    });
+
+    it('can change the root directory of a linked package', async function() {
+      const projectDirectory = await new Directory().mkdir('project');
+      await projectDirectory.writeFile('package.json', {
+        name: 'project',
+        scripts: {
+          'linked-bin': 'bin-name'
+        }
+      });
+
+      const linkedDirectory = await new Directory().mkdir('linked');
+      await linkedDirectory.writeFile('package.json', {
+        name: 'linked',
+        main: 'src/index.js',
+        bin: {
+          'bin-name': 'src/bin/bin-file.js'
+        }
+      });
+      const srcDirectory = await linkedDirectory.mkdir('src');
+      srcDirectory.writeFile(
+        'index.js',
+        `module.exports = 'linked package'`
+      );
+      const libDirectory = await srcDirectory.mkdir('lib');
+      await libDirectory.writeFile(
+        'lib.js',
+        `module.exports = 'lib code'`
+      );
+      const binDirectory = await srcDirectory.mkdir('bin');
+      await binDirectory.writeFile(
+        'bin-file.js',
+        `#!/usr/bin/env node\nconsole.log('linked-bin')`
+      );
+
+      const project = new Project(projectDirectory.path);
+      await project.link(linkedDirectory.path, 'src');
+
+      expect(await projectDirectory.execNode(`require('linked')`))
+        .toBe('linked package');
+      expect(await projectDirectory.execNode(`require('linked/lib/lib')`))
+        .toBe('lib code');
 
       const output = await projectDirectory.execSh(`npm run linked-bin`);
       expect(output.split('\n').slice(-1)[0]).toBe('linked-bin');

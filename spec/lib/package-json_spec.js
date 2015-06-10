@@ -1,4 +1,4 @@
-import PackageJson from '../../src/lib/package-json';
+import PackageJson from 'dist-es6/lib/package-json';
 
 describe('PackageJson', function() {
   describe('making the paths relative to another directory', function() {

@@ -21,7 +21,7 @@ export default class Project {
     return this.cachedPackageJson;
   }
 
-  async link(packagePath) {
+  async link(packagePath, rootDirectory = '') {
     const packageDir = new Directory(packagePath);
     const [packageJson, nodeModules] = await* [
       packageDir.readFile('package.json'),
@@ -29,7 +29,7 @@ export default class Project {
     ];
     const [bin] = await* [
       await nodeModules.mkdir('.bin'),
-      nodeModules.symlink(packageDir.path, packageJson.name)
+      nodeModules.symlink(packageDir.join(rootDirectory), packageJson.name)
     ];
     await* Object.keys(Object(packageJson.bin))
       .map(async binName => {
