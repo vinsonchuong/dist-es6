@@ -101,10 +101,10 @@ describe('dist-es6', function() {
     await project.link('.', 'src');
     await project.directory.execSh('npm install');
 
+    const distDirectory = await project.directory.mkdir('dist');
+    await distDirectory.execSh('npm install');
     expect(await project.directory.execNode(`require('./dist').default`))
       .toBe('main');
-
-    const distDirectory = await project.directory.mkdir('dist');
     expect(await distDirectory.readFile('main.js'))
       .toContain('babel-runtime');
     expect(await distDirectory.readFile('package.json'))
