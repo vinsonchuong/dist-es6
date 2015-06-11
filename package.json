@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "babel": "^5.5.4",
-    "babel-runtime": "^5.5.4",
     "node-promise-es6": "^0.0.1",
     "posix": "^2.0.1"
   },

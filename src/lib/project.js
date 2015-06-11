@@ -4,10 +4,7 @@ const babelRegisterPath = require.resolve('babel/register');
 function babelAdapter(jsFilePath) {
   return `#!/usr/bin/env node
 'use strict';
-require('${babelRegisterPath}')({
-  stage: 0,
-  optional: ['runtime']
-});
+require('${babelRegisterPath}')({stage: 0});
 require('${jsFilePath}');
 `;
 }

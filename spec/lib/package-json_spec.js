@@ -111,7 +111,7 @@ describe('PackageJson', function() {
     ).toEqual({
       name: 'project',
       dependencies: {
-        'babel-runtime': require('babel-runtime/package.json').version
+        'babel-runtime': require('babel/package.json').version
       }
     });
 
@@ -126,7 +126,7 @@ describe('PackageJson', function() {
       name: 'project',
       dependencies: {
         'foo-bar': '1.0.0',
-        'babel-runtime': require('babel-runtime/package.json').version
+        'babel-runtime': require('babel/package.json').version
       }
     });
   });
