@@ -1,9 +1,6 @@
 import Directory from 'dist-es6/lib/directory';
 import Project from 'dist-es6/lib/project';
 
-import install from 'jasmine-es6';
-install();
-
 describe('dist-es6', function() {
   beforeEach(async function() {
     const cwd = new Directory();

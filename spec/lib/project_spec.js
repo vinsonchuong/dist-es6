@@ -1,9 +1,6 @@
 import Directory from 'dist-es6/lib/directory';
 import Project from 'dist-es6/lib/project';
 
-import install from 'jasmine-es6';
-install();
-
 describe('Project', function() {
   it('can read the package.json', async function() {
     const project = new Project();
