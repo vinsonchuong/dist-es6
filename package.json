@@ -1,6 +1,6 @@
 {
   "name": "dist-es6",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Utilities to support development of npm packages in ES6+",
   "keywords": ["es6"],
   "homepage": "https://github.com/vinsonchuong/dist-es6",
@@ -26,6 +26,6 @@
   },
   "devDependencies": {
     "eslint-defaults": "^0.0.3",
-    "jasmine-es6": "^0.0.6"
+    "jasmine-es6": "^0.0.7"
   }
 }
