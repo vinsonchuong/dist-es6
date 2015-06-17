@@ -31,12 +31,18 @@ async function compileJs(project) {
   ].join(' '));
 }
 
+const shebang = '#!/usr/bin/env node';
 async function compileExecutables(bins, distDirectory) {
   await* Object.keys(bins)
     .map(binName => distDirectory.join(bins[binName]))
     .map(async binPath => {
-      const binContents = await fs.readFile(binPath);
-      await fs.writeFile(binPath, '#!/usr/bin/env node\n' + binContents);
+      const binContents = await fs.readFile(binPath, 'utf8');
+      await fs.writeFile(
+        binPath,
+        binContents.indexOf(shebang) !== 0 ?
+          `${shebang}\n${binContents}` :
+          binContents
+      );
       await fs.chmod(binPath, '755');
     });
 }

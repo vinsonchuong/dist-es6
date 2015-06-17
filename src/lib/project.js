@@ -1,10 +1,11 @@
 import Directory from './directory';
+import fs from 'node-promise-es6/fs';
 
 const babelRegisterPath = require.resolve('babel/register');
-function babelAdapter(jsFilePath) {
+function binAdapter(jsFilePath, babel = true) {
   return `#!/usr/bin/env node
 'use strict';
-require('${babelRegisterPath}')({stage: 0});
+${babel ? `require('${babelRegisterPath}')({stage: 0});` : ''}
 require('${jsFilePath}');
 `;
 }
@@ -33,9 +34,14 @@ export default class Project {
     ];
     await* Object.keys(Object(packageJson.bin))
       .map(async binName => {
+        const binPath = packageDir.join(packageJson.bin[binName]);
+        const binContents = await fs.readFile(binPath, 'utf8');
         await bin.writeFile(
           binName,
-          babelAdapter(packageDir.join(packageJson.bin[binName]))
+          binAdapter(
+            binPath,
+            binContents.indexOf('#!/usr/bin/env node') !== 0
+          )
         );
         await bin.chmod(binName, '755');
       });

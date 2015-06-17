@@ -48,8 +48,10 @@ directory. The `main` and `bin` fields must only refer to files inside of the
 }
 ```
 
-Note that `dist-es6` will automatically add shebangs and executable
-permissions to any file listed in the `bin` field.
+For executables written in ES6+, do not add a shebang to the file; `dist-es6`
+will automatically add a shebang after compilation or linking. For executables
+not written in ES6+ (that can run as is via `node`), you still need to add a
+shebang.
 
 Now, you'll be able to directly run executables from the current project on
 command line. You'll also be able to require files from the current project via

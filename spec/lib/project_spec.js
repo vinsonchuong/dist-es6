@@ -41,7 +41,8 @@ describe('Project', function() {
       await projectDirectory.writeFile('package.json', {
         name: 'project',
         scripts: {
-          'linked-bin': 'bin-name'
+          'linked-bin': 'bin-name',
+          'es6-bin': 'es6-bin'
         }
       });
 
@@ -49,20 +50,30 @@ describe('Project', function() {
       await linkedDirectory.writeFile('package.json', {
         name: 'linked',
         bin: {
-          'bin-name': 'bin-file.js'
+          'bin-name': 'bin-file.js',
+          'es6-bin': 'es6-bin-file.js'
         }
       });
       await linkedDirectory.writeFile('index.js', `console.log('linked')`);
       await linkedDirectory.writeFile(
         'bin-file.js',
-        `#!/usr/bin/env node\nconsole.log('linked-bin')`
+        `#!/usr/bin/env node
+        require('babel/register')({stage: 0});
+        console.log('linked-bin')`
+      );
+      await linkedDirectory.writeFile(
+        'es6-bin-file.js',
+        `const {text} = {text: 'es6 bin'}; console.log(text)`
       );
 
       const project = new Project(projectDirectory.path);
       await project.link(linkedDirectory.path);
 
-      const output = await projectDirectory.execSh(`npm run linked-bin`);
-      expect(output.split('\n').slice(-1)[0]).toBe('linked-bin');
+      const binOutput = await projectDirectory.execSh(`npm run linked-bin`);
+      expect(binOutput.split('\n').slice(-1)[0]).toBe('linked-bin');
+
+      const es6BinOutput = await projectDirectory.execSh(`npm run es6-bin`);
+      expect(es6BinOutput.split('\n').slice(-1)[0]).toBe('es6 bin');
     });
 
     it('can link packages containing ES6 executables', async function() {
