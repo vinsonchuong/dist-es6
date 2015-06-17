@@ -9,7 +9,7 @@ export default class Directory {
   }
 
   join(...joinPaths) {
-    return path.join(this.path, ...joinPaths);
+    return path.resolve(this.path, ...joinPaths);
   }
 
   async execSh(command) {

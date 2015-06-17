@@ -46,4 +46,13 @@ export default class Project {
         await bin.chmod(binName, '755');
       });
   }
+
+  async linkAll() {
+    const {linkDependencies = {}} = await this.packageJson();
+    await* [
+      this.link(this.directory.path, 'src'),
+      ...Object.keys(linkDependencies)
+        .map(name => this.link(this.directory.join(linkDependencies[name])))
+    ];
+  }
 }

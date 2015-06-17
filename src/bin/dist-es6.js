@@ -1,18 +1,7 @@
-import path from 'path';
 import fs from 'node-promise-es6/fs';
 import posix from 'posix';
 import Project from '../lib/project';
 import PackageJson from '../lib/package-json';
-
-async function linkLocalPackages(project) {
-  const {linkDependencies = {}} = await project.packageJson();
-  await* [
-    project.link('.', 'src'),
-    ...Object.keys(linkDependencies)
-      .map(name => path.resolve(linkDependencies[name]))
-      .map(linkDependencyPath => project.link(linkDependencyPath))
-  ];
-}
 
 async function compileJs(project) {
   const projectDirectoryContents = await project.directory.ls();
@@ -80,7 +69,7 @@ async function compile(project) {
 async function run() {
   const project = new Project();
   await* [
-    linkLocalPackages(project),
+    project.linkAll(),
     compile(project)
   ];
 

@@ -148,5 +148,38 @@ describe('Project', function() {
       const output = await projectDirectory.execSh(`npm run linked-bin`);
       expect(output.split('\n').slice(-1)[0]).toBe('linked-bin');
     });
+
+    it('can link packages listed in linkDependencies as well as the current package', async function() {
+      const rootDirectory = new Directory();
+
+      const linkedDirectory = await rootDirectory.mkdir('linked');
+      await linkedDirectory.writeFile('package.json', {
+        name: 'linked'
+      });
+      await linkedDirectory.writeFile(
+        'index.js',
+        `module.exports = 'link dependency main'`
+      );
+
+      const projectDirectory = await rootDirectory.mkdir('project');
+      await projectDirectory.writeFile('package.json', {
+        name: 'project',
+        main: 'src/index.js',
+        linkDependencies: {
+          linked: linkedDirectory.path
+        }
+      });
+      const srcDirectory = await projectDirectory.mkdir('src');
+      await srcDirectory.writeFile(
+        'index.js',
+        `module.exports = require('linked')`
+      );
+      const project = new Project('project');
+
+      await project.linkAll();
+
+      expect(await projectDirectory.execNode(`require('project')`))
+        .toBe('link dependency main');
+    });
   });
 });

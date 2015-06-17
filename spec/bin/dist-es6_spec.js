@@ -43,39 +43,6 @@ describe('dist-es6', function() {
       .toBe('lib code');
   }, 30000);
 
-  it('enables linkDependencies to be imported by name', async function() {
-    const linkDependency = new Project('link-dependency');
-    await linkDependency.directory.writeFile('package.json', {
-      name: 'link-dependency'
-    });
-    await linkDependency.directory.writeFile(
-      'index.js',
-      `module.exports = 'link dependency main'`
-    );
-
-    const project = new Project('project');
-    await project.directory.writeFile('package.json', {
-      name: 'project',
-      main: 'src/index.js',
-      scripts: {
-        prepublish: 'dist-es6'
-      },
-      linkDependencies: {
-        'link-dependency': linkDependency.directory.path
-      }
-    });
-    const srcDirectory = await project.directory.mkdir('src');
-    await srcDirectory.writeFile(
-      'index.js',
-      `module.exports = require('link-dependency')`
-    );
-    await project.link('.', 'src');
-    await project.directory.execSh('npm install');
-
-    expect(await project.directory.execNode(`require('project')`))
-      .toBe('link dependency main');
-  }, 30000);
-
   it('compiles ES6+ JS from the src directory to the dist directory', async function() {
     const project = new Project('project');
     await project.directory.writeFile('package.json', {
