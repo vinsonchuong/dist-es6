@@ -41,7 +41,7 @@ describe('dist-es6', function() {
       .toBe('project main');
     expect(await project.directory.execNode(`require('project/lib/lib')`))
       .toBe('lib code');
-  });
+  }, 30000);
 
   it('enables linkDependencies to be imported by name', async function() {
     const linkDependency = new Project('link-dependency');
@@ -74,7 +74,7 @@ describe('dist-es6', function() {
 
     expect(await project.directory.execNode(`require('project')`))
       .toBe('link dependency main');
-  });
+  }, 30000);
 
   it('compiles ES6+ JS from the src directory to the dist directory', async function() {
     const project = new Project('project');
@@ -110,7 +110,7 @@ describe('dist-es6', function() {
           'babel-runtime': jasmine.any(String)
         }
       }));
-  });
+  }, 30000);
 
   it('maps executables correctly', async function() {
     const project = new Project('project');
@@ -140,7 +140,7 @@ describe('dist-es6', function() {
     const {bin: binConfig} = await distDirectory.readFile('package.json');
     expect(binConfig).toEqual({'bin-name': 'bin-file.js'});
     expect(await distDirectory.execSh('./bin-file.js')).toBe('bin text');
-  });
+  }, 30000);
 
   it('adds other whitelisted files to dist', async function() {
     const project = new Project('project');
@@ -172,7 +172,7 @@ describe('dist-es6', function() {
     expect(await distDirectory.readFile('config.json')).toEqual({foo: 'bar'});
     expect(distDirectoryFiles.sort())
       .toEqual(['README.md', 'main.js', 'package.json', 'config.json'].sort());
-  });
+  }, 30000);
 
   it('clears the dist directory before compilation', async function() {
     const project = new Project('project');
@@ -196,7 +196,7 @@ describe('dist-es6', function() {
     await project.directory.execSh('npm install');
     const distDirectoryFiles = await distDirectory.ls();
     expect(distDirectoryFiles).not.toContain('extra-file');
-  });
+  }, 30000);
 
   it('removes unnecessary keys from the package.json', async function() {
     const project = new Project('project');
@@ -226,5 +226,5 @@ describe('dist-es6', function() {
       scripts: {},
       dependencies: jasmine.any(Object)
     });
-  });
+  }, 30000);
 });
