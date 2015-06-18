@@ -24,7 +24,8 @@ describe('Project', function() {
       await linkedDirectory.writeFile('package.json', {
         name: 'linked'
       });
-      linkedDirectory.writeFile(
+      const srcDirectory = await linkedDirectory.mkdir('src');
+      await srcDirectory.writeFile(
         'index.js',
         `module.exports = 'linked package'`
       );
@@ -50,18 +51,18 @@ describe('Project', function() {
       await linkedDirectory.writeFile('package.json', {
         name: 'linked',
         bin: {
-          'bin-name': 'bin-file.js',
-          'es6-bin': 'es6-bin-file.js'
+          'bin-name': 'src/bin-file.js',
+          'es6-bin': 'src/es6-bin-file.js'
         }
       });
-      await linkedDirectory.writeFile('index.js', `console.log('linked')`);
-      await linkedDirectory.writeFile(
+      const srcDirectory = await linkedDirectory.mkdir('src');
+      await srcDirectory.writeFile(
         'bin-file.js',
         `#!/usr/bin/env node
         require('babel/register')({stage: 0});
         console.log('linked-bin')`
       );
-      await linkedDirectory.writeFile(
+      await srcDirectory.writeFile(
         'es6-bin-file.js',
         `const {text} = {text: 'es6 bin'}; console.log(text)`
       );
@@ -89,10 +90,11 @@ describe('Project', function() {
       await linkedDirectory.writeFile('package.json', {
         name: 'linked',
         bin: {
-          'bin-name': 'bin-file.js'
+          'bin-name': 'src/bin-file.js'
         }
       });
-      await linkedDirectory.writeFile(
+      const srcDirectory = await linkedDirectory.mkdir('src');
+      await srcDirectory.writeFile(
         'bin-file.js',
         `const {name} = {name: 'linked-bin'}; console.log(name)`
       );
@@ -156,7 +158,8 @@ describe('Project', function() {
       await linkedDirectory.writeFile('package.json', {
         name: 'linked'
       });
-      await linkedDirectory.writeFile(
+      const linkedSrcDirectory = await linkedDirectory.mkdir('src');
+      await linkedSrcDirectory.writeFile(
         'index.js',
         `module.exports = 'link dependency main'`
       );
