@@ -1,5 +1,5 @@
 import Directory from './directory';
-import fs from 'node-promise-es6/fs';
+import PackageJson from '../lib/package-json';
 
 const babelRegisterPath = require.resolve('babel/register');
 function binAdapter(jsFilePath, babel = true) {
@@ -34,12 +34,12 @@ export default class Project {
     ];
     await* Object.keys(Object(packageJson.bin))
       .map(async binName => {
-        const binPath = packageDir.join(packageJson.bin[binName]);
-        const binContents = await fs.readFile(binPath, 'utf8');
+        const binPath = packageJson.bin[binName];
+        const binContents = await packageDir.readFile(binPath);
         await bin.writeFile(
           binName,
           binAdapter(
-            binPath,
+            packageDir.join(binPath),
             binContents.indexOf('#!/usr/bin/env node') !== 0
           )
         );
@@ -54,5 +54,47 @@ export default class Project {
       ...Object.keys(linkDependencies)
         .map(name => this.link(this.directory.join(linkDependencies[name])))
     ];
+  }
+
+  async compile() {
+    await this.directory.rm('dist');
+    const distDirectory = await this.directory.mkdir('dist');
+
+    const packageJson = await this.packageJson();
+    const distPackageJson = new PackageJson(packageJson)
+      .moveTo('src')
+      .toProduction()
+      .addBabelRuntime()
+      .toJSON();
+
+    await distDirectory.writeFile('package.json', distPackageJson);
+
+    await* (packageJson.files || [])
+      .filter(fileName => fileName.indexOf('src') !== 0)
+      .map(fileName => distDirectory.cp(this.directory.join(fileName), fileName));
+
+    await this.directory.mkdir('src');
+    await this.directory.execSh([
+      `'${require.resolve('babel/bin/babel')}'`,
+      '--stage 0',
+      '--optional runtime',
+      '--copy-files',
+      'src',
+      '--out-dir dist'
+    ].join(' '));
+
+    const {bin = {}} = distPackageJson;
+    const shebang = '#!/usr/bin/env node';
+    await* Object.keys(bin).map(async binName => {
+      const binPath = bin[binName];
+      const binContents = await distDirectory.readFile(binPath);
+      await distDirectory.writeFile(
+        binPath,
+        binContents.indexOf(shebang) !== 0 ?
+          `${shebang}\n${binContents}` :
+          binContents
+      );
+      await distDirectory.chmod(binPath, '755');
+    });
   }
 }

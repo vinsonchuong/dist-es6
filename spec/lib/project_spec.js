@@ -182,4 +182,144 @@ describe('Project', function() {
         .toBe('link dependency main');
     });
   });
+
+  describe('compiling the project', function() {
+    afterEach(async function() {
+      await new Directory().rm('project');
+      await new Directory().rm('user');
+    });
+
+    it('clears the dist directory', async function() {
+      const projectDirectory = await new Directory().mkdir('project');
+      const distDirectory = await projectDirectory.mkdir('dist');
+      await projectDirectory.writeFile('package.json', {
+        name: 'project'
+      });
+      await distDirectory.writeFile('file', 'file text');
+
+      const project = new Project('project');
+      await project.compile();
+      expect(await distDirectory.ls()).not.toContain('file');
+    });
+
+    it('copies package.json to dist, excluding unnecessary keys and adding the babel-runtime', async function() {
+      const projectDirectory = await new Directory().mkdir('project');
+      await projectDirectory.writeFile('package.json', {
+        name: 'project',
+        files: ['src'],
+        main: 'src/main.js',
+        scripts: {
+          prepublish: 'dist-es6',
+          test: 'eslint && jasmine'
+        },
+        dependencies: {
+          foo: '1.0.0'
+        }
+      });
+
+      const project = new Project('project');
+      await project.compile();
+
+      const distDirectory = await projectDirectory.mkdir('dist');
+      expect(await distDirectory.readFile('package.json')).toEqual({
+        name: 'project',
+        main: 'main.js',
+        scripts: {
+          test: 'eslint && jasmine'
+        },
+        dependencies: {
+          foo: '1.0.0',
+          'babel-runtime': require('babel/package.json').version
+        }
+      });
+    });
+
+    it('copies whitelisted files to dist', async function() {
+      const projectDirectory = await new Directory().mkdir('project');
+      await projectDirectory.writeFile('package.json', {
+        name: 'project',
+        files: ['LICENSE', 'README.md', 'src']
+      });
+      await projectDirectory.writeFile('LICENSE', 'license text');
+      await projectDirectory.writeFile('README.md', '# Project');
+      const srcDirectory = await projectDirectory.mkdir('src');
+      await srcDirectory.writeFile('config.json', {foo: 'bar'});
+
+      const project = new Project('project');
+      await project.compile();
+
+      const distDirectory = await projectDirectory.mkdir('dist');
+      expect(await distDirectory.readFile('LICENSE')).toBe('license text');
+      expect(await distDirectory.readFile('README.md')).toBe('# Project');
+      expect(await distDirectory.readFile('config.json')).toEqual({foo: 'bar'});
+    });
+
+    it('compiles ES6+ JS from src into dist', async function() {
+      const projectDirectory = await new Directory().mkdir('project');
+      await projectDirectory.writeFile('package.json', {
+        name: 'project',
+        files: ['src'],
+        main: 'src/main.js'
+      });
+      const srcDirectory = await projectDirectory.mkdir('src');
+      await srcDirectory.writeFile(
+        'main.js',
+        `
+          const nums = [1, 2, 3];
+          export const x2 = [for (x of nums) 2 * x];
+          export async function fn() {}
+          export default 'main code';
+        `
+      );
+
+      const project = new Project('project');
+      await project.compile();
+
+      const distDirectory = await projectDirectory.mkdir('dist');
+      await distDirectory.execSh('npm install');
+      expect(await distDirectory.execNode(`require('./').default`))
+        .toBe('main code');
+      expect(await distDirectory.readFile('main.js'))
+        .toContain('babel-runtime');
+    }, 60000);
+
+    it('compiles executables correctly', async function() {
+      const projectDirectory = await new Directory().mkdir('project');
+      await projectDirectory.writeFile('package.json', {
+        name: 'project',
+        version: '0.0.1',
+        files: ['src'],
+        bin: {
+          'bin-name': 'src/bin/bin-file.js'
+        }
+      });
+      const srcDirectory = await projectDirectory.mkdir('src');
+      const binDirectory = await srcDirectory.mkdir('bin');
+      await binDirectory.writeFile(
+        'bin-file.js',
+        `
+          const nums = [1, 2, 3];
+          export const numsX2 = [for (x of nums) 2 * x];
+          console.log(numsX2.join(', '));
+        `
+      );
+
+      const project = new Project('project');
+      await project.compile();
+
+      const userDirectory = await new Directory().mkdir('user');
+      await userDirectory.writeFile('package.json', {
+        name: 'user',
+        scripts: {
+          'bin-name': 'bin-name'
+        },
+        dependencies: {
+          project: 'file:../project/dist'
+        }
+      });
+      await userDirectory.execSh('npm install');
+      expect(await userDirectory.execSh('npm run bin-name'))
+        .toContain('2, 4, 6');
+    }, 60000);
+  });
 });

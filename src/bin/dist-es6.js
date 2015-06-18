@@ -1,76 +1,11 @@
-import fs from 'node-promise-es6/fs';
 import posix from 'posix';
 import Project from '../lib/project';
-import PackageJson from '../lib/package-json';
-
-async function compileJs(project) {
-  const projectDirectoryContents = await project.directory.ls();
-  if (projectDirectoryContents.indexOf('src') === -1) {
-    process.stderr.write('No src directory found.\n');
-    return;
-  }
-
-  await project.directory.execSh([
-    `'${require.resolve('babel/bin/babel')}'`,
-    '--stage 0',
-    '--optional runtime',
-    '--copy-files',
-    'src',
-    '--out-dir dist'
-  ].join(' '));
-}
-
-const shebang = '#!/usr/bin/env node';
-async function compileExecutables(bins, distDirectory) {
-  await* Object.keys(bins)
-    .map(binName => distDirectory.join(bins[binName]))
-    .map(async binPath => {
-      const binContents = await fs.readFile(binPath, 'utf8');
-      await fs.writeFile(
-        binPath,
-        binContents.indexOf(shebang) !== 0 ?
-          `${shebang}\n${binContents}` :
-          binContents
-      );
-      await fs.chmod(binPath, '755');
-    });
-}
-
-async function copyFiles(files, distDirectory) {
-  await* files
-    .filter(fileName => fileName.indexOf('src') !== 0)
-    .map(fileName => distDirectory.cp(fileName, fileName));
-}
-
-async function productionPackageJson(project) {
-  const packageJson = await project.packageJson();
-  return new PackageJson(packageJson)
-    .moveTo('src')
-    .toProduction()
-    .addBabelRuntime()
-    .toJSON();
-}
-
-async function compile(project) {
-  await project.directory.rm('dist');
-  const [packageJson, distDirectory, distPackageJson] = await* [
-    project.packageJson(),
-    project.directory.mkdir('dist'),
-    productionPackageJson(project),
-    compileJs(project)
-  ];
-  await* [
-    distDirectory.writeFile('package.json', distPackageJson),
-    copyFiles(packageJson.files || [], distDirectory),
-    compileExecutables(Object(distPackageJson.bin), distDirectory)
-  ];
-}
 
 async function run() {
   const project = new Project();
   await* [
     project.linkAll(),
-    compile(project)
+    project.compile()
   ];
 
   const currentNpmCommand = JSON.parse(process.env.npm_config_argv).original[0];
