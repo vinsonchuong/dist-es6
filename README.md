@@ -115,13 +115,7 @@ npm publish
 The above will compile the package into the `dist` directory and run
 `npm publish` on the `dist` directory. Note that as an implementation detail,
 the command will return code `143`, which will probably cause deployment
-scripts to fail. You can either explicitly check the error code or run the
-following two commands instead:
-
-```sh
-npm install
-npm publish dist
-```
+scripts to fail. You need to explicitly check the error code.
 
 ## Development
 ### Getting Started
