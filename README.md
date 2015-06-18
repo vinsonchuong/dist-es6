@@ -10,7 +10,9 @@ to figure out relative paths. `dist-es6` also adds a new field
 
 When you're ready to publish your package, `dist-es6` compiles ES6+ code from
 the `src` directory, copies the `package.json`, and copies other whitelisted
-files (from the `files` field in `package.json`) into the `dist` directory.
+files (from the `files` field in `package.json`) into the `dist` directory; it
+then publishes the `dist` directory, ensuring that users only deal with the
+compiled code.
 
 ## Installing
 `dist-es6` is available as an
@@ -53,9 +55,11 @@ will automatically add a shebang after compilation or linking. For executables
 not written in ES6+ (that can run as is via `node`), you still need to add a
 shebang.
 
+Remember to run `npm install` after any changes to `package.json`.
+
 Now, you'll be able to directly run executables from the current project on
-command line. You'll also be able to require files from the current project via
-module path instead of relative path:
+the command line. You'll also be able to require files from the current project
+via module path instead of relative path:
 
 ```js
 import code from 'project/lib/code';
