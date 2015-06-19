@@ -83,6 +83,8 @@ Dependencies on local packages for development can be listed as follows:
 }
 ```
 
+Packages listed in `linkDependencies` should be removed from `devDependencies`.
+
 Note that runtime dependencies of any link dependencies will be installed
 directly in the project that declares the link dependencies. In other words,
 if two link dependencies depend on different versions of a package, only one of
