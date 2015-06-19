@@ -2,10 +2,14 @@ import Directory from './directory';
 import PackageJson from '../lib/package-json';
 
 const babelRegisterPath = require.resolve('babel/register');
+const babelRegister = `var babelRegisterPath = '${babelRegisterPath}';
+try { babelRegisterPath = require.resolve('babel/register');  } catch (e) {}
+require(babelRegisterPath)({stage: 0});`;
+
 function binAdapter(jsFilePath, babel = true) {
   return `#!/usr/bin/env node
 'use strict';
-${babel ? `require('${babelRegisterPath}')({stage: 0});` : ''}
+${babel ? babelRegister : ''}
 require('${jsFilePath}');
 `;
 }
@@ -29,8 +33,10 @@ export default class Project {
       this.directory.mkdir('node_modules')
     ];
 
+    const installedPackages = await nodeModules.ls();
     const {dependencies = {}} = packageJson;
     const installArgs = Object.keys(dependencies)
+      .filter(name => installedPackages.indexOf(name) === -1)
       .map(name => `'${name}@${dependencies[name]}'`)
       .join(' ');
     const output = await this.directory.execSh(`npm install ${installArgs}`);
