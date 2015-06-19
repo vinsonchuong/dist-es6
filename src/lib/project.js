@@ -33,15 +33,17 @@ export default class Project {
       this.directory.mkdir('node_modules')
     ];
 
-    const installedPackages = await nodeModules.ls();
-    const {dependencies = {}} = packageJson;
-    const installArgs = Object.keys(dependencies)
-      .filter(name => installedPackages.indexOf(name) === -1)
-      .map(name => `'${name}@${dependencies[name]}'`)
-      .join(' ');
-    const output = await this.directory.execSh(`npm install ${installArgs}`);
-    if (output.trim()) {
-      process.stdout.write(`${output.trim()}\n`);
+    if (packagePath !== this.directory.path) {
+      const installedPackages = await nodeModules.ls();
+      const {dependencies = {}} = packageJson;
+      const installArgs = Object.keys(dependencies)
+        .filter(name => installedPackages.indexOf(name) === -1)
+        .map(name => `'${name}@${dependencies[name]}'`)
+        .join(' ');
+      const output = await this.directory.execSh(`npm install ${installArgs}`);
+      if (output.trim()) {
+        process.stdout.write(`${output.trim()}\n`);
+      }
     }
 
     const [bin] = await* [
