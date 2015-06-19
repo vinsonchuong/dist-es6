@@ -28,6 +28,16 @@ export default class Project {
       packageDir.readFile('package.json'),
       this.directory.mkdir('node_modules')
     ];
+
+    const {dependencies = {}} = packageJson;
+    const installArgs = Object.keys(dependencies)
+      .map(name => `'${name}@${dependencies[name]}'`)
+      .join(' ');
+    const output = await this.directory.execSh(`npm install ${installArgs}`);
+    if (output.trim()) {
+      process.stdout.write(`${output.trim()}\n`);
+    }
+
     const [bin] = await* [
       await nodeModules.mkdir('.bin'),
       nodeModules.symlink(packageDir.join('src'), packageJson.name)

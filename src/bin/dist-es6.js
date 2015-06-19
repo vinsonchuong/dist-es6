@@ -9,7 +9,9 @@ async function run() {
   } else if (currentNpmCommand === 'publish') {
     await project.compile();
     const output = await project.directory.execSh('npm publish dist');
-    process.stdout.write(`${output}\n`);
+    if (output.trim()) {
+      process.stdout.write(`${output.trim()}\n`);
+    }
     process.kill(posix.getppid());
     await project.directory.rm('dist');
   }

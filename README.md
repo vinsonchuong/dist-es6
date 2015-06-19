@@ -83,6 +83,12 @@ Dependencies on local packages for development can be listed as follows:
 }
 ```
 
+Note that runtime dependencies of any link dependencies will be installed
+directly in the project that declares the link dependencies. In other words,
+if two link dependencies depend on different versions of a package, only one of
+the versions will be installed. So, please ensure that all link dependencies
+depend on compatible versions of any overlapping dependencies.
+
 For publishing, files outside of the `src` directory that need to be published
 must be whitelisted in the `files` field as follows:
 

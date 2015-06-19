@@ -77,6 +77,28 @@ describe('Project', function() {
       expect(es6BinOutput.split('\n').slice(-1)[0]).toBe('es6 bin');
     });
 
+    it('installs any runtime dependencies of the linked package', async function() {
+      const projectDirectory = await new Directory().mkdir('project');
+      await projectDirectory.writeFile('package.json', {
+        name: 'project'
+      });
+
+      const linkedDirectory = await new Directory().mkdir('linked');
+      await linkedDirectory.writeFile('package.json', {
+        name: 'linked',
+        dependencies: {
+          jquery: '2.1.4'
+        }
+      });
+
+      const project = new Project(projectDirectory.path);
+      await project.link(linkedDirectory.path);
+
+      expect(
+        await projectDirectory.readFile('node_modules/jquery/package.json')
+      ).toEqual(jasmine.objectContaining({version: '2.1.4'}));
+    }, 60000);
+
     it('can link packages containing ES6 executables', async function() {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
