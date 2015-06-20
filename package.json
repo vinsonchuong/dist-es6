@@ -2,12 +2,18 @@
   "name": "dist-es6",
   "version": "0.0.13",
   "description": "Utilities to support development of npm packages in ES6+",
-  "keywords": ["es6"],
+  "keywords": [
+    "es6"
+  ],
   "homepage": "https://github.com/vinsonchuong/dist-es6",
   "bugs": "https://github.com/vinsonchuong/dist-es6/issues",
   "license": "MIT",
   "author": "Vinson Chuong <vinsonchuong@gmail.com>",
-  "files": ["LICENSE", "README.md", "src"],
+  "files": [
+    "LICENSE",
+    "README.md",
+    "src"
+  ],
   "bin": {
     "dist-es6": "src/bin/dist-es6.js"
   },

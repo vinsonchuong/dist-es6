@@ -71,11 +71,10 @@ export default class Project {
 
   async linkAll() {
     const {linkDependencies = {}} = await this.packageJson();
-    await* [
-      this.link(this.directory.path),
-      ...Object.keys(linkDependencies)
-        .map(name => this.link(this.directory.join(linkDependencies[name])))
-    ];
+    await this.link(this.directory.path);
+    for (const name of Object.keys(linkDependencies)) {
+      await this.link(this.directory.join(linkDependencies[name]));
+    }
   }
 
   async compile() {
