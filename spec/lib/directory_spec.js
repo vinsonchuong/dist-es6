@@ -273,6 +273,13 @@ describe('Directory', function() {
       const directory = new Directory('directory');
       expect(await directory.execSh('pwd')).toBe(directory.path);
     });
+
+    it('passes the environment to the command', async function() {
+      const directory = new Directory('directory');
+      process.env.testVal = '42';
+      expect(await directory.execSh('printenv')).toContain('testVal=42');
+      delete process.env.testVal;
+    });
   });
 
   describe('executing JavaScript in node', function() {
