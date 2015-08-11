@@ -254,7 +254,7 @@ describe('Project', function() {
         },
         dependencies: {
           foo: '1.0.0',
-          'babel-runtime': require('babel/package.json').version
+          'babel-runtime': `<= ${require('babel/package.json').version}`
         }
       });
     });

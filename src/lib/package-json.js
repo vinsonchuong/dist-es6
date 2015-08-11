@@ -69,7 +69,7 @@ export default class PackageJson {
   addBabelRuntime() {
     return this.map({
       dependencies: Object.assign({}, this.packageJson.dependencies, {
-        'babel-runtime': require('babel/package.json').version
+        'babel-runtime': `<= ${require('babel/package.json').version}`
       })
     });
   }
