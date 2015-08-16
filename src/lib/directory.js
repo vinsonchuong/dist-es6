@@ -5,7 +5,10 @@ import {exec} from 'node-promise-es6/child-process';
 export default class Directory {
   constructor(...directoryPath) {
     this.path = path.resolve(...directoryPath);
+
+    /* eslint-disable */
     fs.readdirSync(this.path);
+    /* eslint-enable */
   }
 
   join(...joinPaths) {
@@ -42,10 +45,9 @@ export default class Directory {
 
   async writeFile(childFileName, contents) {
     const childFilePath = this.join(childFileName);
-    const childFileContents = (
-      typeof contents === 'object' ? JSON.stringify(contents) :
-      contents
-    );
+    const childFileContents = typeof contents === 'object' ?
+      JSON.stringify(contents) :
+      contents;
     await fs.remove(childFilePath);
     await fs.writeFile(childFilePath, childFileContents);
   }
@@ -57,9 +59,9 @@ export default class Directory {
   async mkdir(childDirectoryName) {
     try {
       await fs.mkdir(this.join(childDirectoryName));
-    } catch (e) {
-      if (e.code !== 'EEXIST') {
-        throw e;
+    } catch (error) {
+      if (error.code !== 'EEXIST') {
+        throw error;
       }
     }
     return new Directory(this.path, childDirectoryName);

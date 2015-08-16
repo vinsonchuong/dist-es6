@@ -1,20 +1,20 @@
 import Directory from 'dist-es6/lib/directory';
 import Project from 'dist-es6/lib/project';
 
-describe('Project', function() {
-  it('can read the package.json', async function() {
+describe('Project', () => {
+  it('can read the package.json', async () => {
     const project = new Project();
     expect(await project.packageJson())
       .toEqual(await new Directory().readFile('package.json'));
   });
 
-  describe('linking local packages', function() {
-    afterEach(async function() {
+  describe('linking local packages', () => {
+    afterEach(async () => {
       await new Directory().rm('project');
       await new Directory().rm('linked');
     });
 
-    it('links a package into a project', async function() {
+    it('links a package into a project', async () => {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
         name: 'project'
@@ -37,7 +37,7 @@ describe('Project', function() {
         .toBe('linked package');
     });
 
-    it('also links any executables provided by the package', async function() {
+    it('also links any executables provided by the package', async () => {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
         name: 'project',
@@ -77,7 +77,7 @@ describe('Project', function() {
       expect(es6BinOutput.split('\n').slice(-1)[0]).toBe('es6 bin');
     });
 
-    it('installs any runtime dependencies of the linked package', async function() {
+    it('installs any runtime dependencies of the linked package', async () => {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
         name: 'project'
@@ -99,7 +99,7 @@ describe('Project', function() {
       ).toEqual(jasmine.objectContaining({version: '2.1.4'}));
     }, 60000);
 
-    it('can link packages containing ES6 executables', async function() {
+    it('can link packages containing ES6 executables', async () => {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
         name: 'project',
@@ -128,7 +128,7 @@ describe('Project', function() {
       expect(output.split('\n').slice(-1)[0]).toBe('linked-bin');
     });
 
-    it('can change the root directory of a linked package', async function() {
+    it('can change the root directory of a linked package', async () => {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
         name: 'project',
@@ -173,7 +173,7 @@ describe('Project', function() {
       expect(output.split('\n').slice(-1)[0]).toBe('linked-bin');
     });
 
-    it('can link packages listed in linkDependencies as well as the current package', async function() {
+    it('can link packages listed in linkDependencies as well as the current package', async () => {
       const rootDirectory = new Directory();
 
       const linkedDirectory = await rootDirectory.mkdir('linked');
@@ -208,13 +208,13 @@ describe('Project', function() {
     });
   });
 
-  describe('compiling the project', function() {
-    afterEach(async function() {
+  describe('compiling the project', () => {
+    afterEach(async () => {
       await new Directory().rm('project');
       await new Directory().rm('user');
     });
 
-    it('clears the dist directory', async function() {
+    it('clears the dist directory', async () => {
       const projectDirectory = await new Directory().mkdir('project');
       const distDirectory = await projectDirectory.mkdir('dist');
       await projectDirectory.writeFile('package.json', {
@@ -227,7 +227,7 @@ describe('Project', function() {
       expect(await distDirectory.ls()).not.toContain('file');
     });
 
-    it('copies package.json to dist, excluding unnecessary keys and adding the babel-runtime', async function() {
+    it('copies package.json to dist, excluding unnecessary keys and adding the babel-runtime', async () => {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
         name: 'project',
@@ -253,13 +253,13 @@ describe('Project', function() {
           test: 'eslint && jasmine'
         },
         dependencies: {
-          foo: '1.0.0',
+          'foo': '1.0.0',
           'babel-runtime': `<= ${require('babel/package.json').version}`
         }
       });
     });
 
-    it('copies whitelisted files to dist', async function() {
+    it('copies whitelisted files to dist', async () => {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
         name: 'project',
@@ -279,7 +279,7 @@ describe('Project', function() {
       expect(await distDirectory.readFile('config.json')).toEqual({foo: 'bar'});
     });
 
-    it('compiles ES6+ JS from src into dist', async function() {
+    it('compiles ES6+ JS from src into dist', async () => {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
         name: 'project',
@@ -308,7 +308,7 @@ describe('Project', function() {
         .toContain('babel-runtime');
     }, 60000);
 
-    it('compiles executables correctly', async function() {
+    it('compiles executables correctly', async () => {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
         name: 'project',

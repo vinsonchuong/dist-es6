@@ -10,8 +10,8 @@ function mapObj(mapper, obj) {
 function removeUndefinedValues(obj) {
   for (const key of Object.keys(obj)) {
     const value = obj[key];
-    if (Object.is(value, undefined)) {
-      delete obj[key];
+    if (value === null || typeof value === 'undefined') {
+      Reflect.deleteProperty(obj, key);
     } else if (typeof value === 'object' && !Array.isArray(obj)) {
       removeUndefinedValues(value);
     }
@@ -31,21 +31,24 @@ export default class PackageJson {
   map(mapper, key) {
     if (key) {
       const value = this.packageJson[key];
-      return (
-        Array.isArray(value) ? value.map(mapper) :
-        value !== null && typeof value === 'object' ? mapObj(mapper, value) :
-        value === null || Object.is(value, undefined) ? undefined :
-        mapper(value)
-      );
-    } else {
-      const overrides = mapObj((subMapper, subKey) =>
-        typeof subMapper === 'function' ?
-          this.map(subMapper, subKey) :
-          subMapper,
-        mapper
-      );
-      return new PackageJson(Object.assign({}, this.packageJson, overrides));
+      if (Array.isArray(value)) {
+        return value.map(mapper);
+      } else if (value !== null && typeof value === 'object') {
+        return mapObj(mapper, value);
+      } else if (value === null || typeof value === 'undefined') {
+        return null;
+      }
+
+      return mapper(value);
     }
+
+    const overrides = mapObj((subMapper, subKey) =>
+      typeof subMapper === 'function' ?
+        this.map(subMapper, subKey) :
+        subMapper,
+      mapper
+    );
+    return new PackageJson(Object.assign({}, this.packageJson, overrides));
   }
 
   moveTo(destinationPath) {
@@ -61,8 +64,8 @@ export default class PackageJson {
 
   toProduction() {
     return this.map({
-      files: undefined,
-      scripts: (value, key) => key === 'prepublish' ? undefined : value
+      files: null,
+      scripts: (value, key) => key === 'prepublish' ? null : value
     });
   }
 

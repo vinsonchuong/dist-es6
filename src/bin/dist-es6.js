@@ -17,7 +17,7 @@ async function run() {
   }
 }
 
-run().catch(e => {
-  process.stderr.write(e.stack + '\n');
+run().catch(error => {
+  process.stderr.write(error.stack + '\n');
   process.exit(1);
 });

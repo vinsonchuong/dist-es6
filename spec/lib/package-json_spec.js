@@ -1,14 +1,14 @@
 import PackageJson from 'dist-es6/lib/package-json';
 
-describe('PackageJson', function() {
-  describe('making the paths relative to another directory', function() {
-    it('returns a new PackageJson with the updated paths', function() {
+describe('PackageJson', () => {
+  describe('making the paths relative to another directory', () => {
+    it('returns a new PackageJson with the updated paths', () => {
       const packageJson = new PackageJson({
         name: 'project',
         files: ['LICENSE', 'README.md', 'src'],
         main: 'src/index.js',
         bin: {
-          'project': 'src/bin/project.js'
+          project: 'src/bin/project.js'
         }
       });
 
@@ -19,18 +19,18 @@ describe('PackageJson', function() {
         files: ['../LICENSE', '../README.md', ''],
         main: 'index.js',
         bin: {
-          'project': 'bin/project.js'
+          project: 'bin/project.js'
         }
       });
     });
 
-    it('ignores missing keys', function() {
+    it('ignores missing keys', () => {
       expect(
         new PackageJson({
           name: 'project',
           main: 'src/index.js',
           bin: {
-            'project': 'src/bin/project.js'
+            project: 'src/bin/project.js'
           }
         }).moveTo('src').toJSON()
       ).toEqual(
@@ -38,7 +38,7 @@ describe('PackageJson', function() {
           name: 'project',
           main: 'index.js',
           bin: {
-            'project': 'bin/project.js'
+            project: 'bin/project.js'
           }
         }
       );
@@ -48,7 +48,7 @@ describe('PackageJson', function() {
           name: 'project',
           files: ['LICENSE', 'README.md', 'src'],
           bin: {
-            'project': 'src/bin/project.js'
+            project: 'src/bin/project.js'
           }
         }).moveTo('src').toJSON()
       ).toEqual(
@@ -56,7 +56,7 @@ describe('PackageJson', function() {
           name: 'project',
           files: ['../LICENSE', '../README.md', ''],
           bin: {
-            'project': 'bin/project.js'
+            project: 'bin/project.js'
           }
         }
       );
@@ -77,13 +77,13 @@ describe('PackageJson', function() {
     });
   });
 
-  it('can return only the keys that are relevant for production', function() {
+  it('can return only the keys that are relevant for production', () => {
     const packageJson = new PackageJson({
       name: 'project',
       files: ['LICENSE', 'README.md', 'src'],
       main: 'src/index.js',
       bin: {
-        'project': 'src/bin/project.js'
+        project: 'src/bin/project.js'
       },
       scripts: {
         prepublish: 'dist-es6',
@@ -95,7 +95,7 @@ describe('PackageJson', function() {
       name: 'project',
       main: 'src/index.js',
       bin: {
-        'project': 'src/bin/project.js'
+        project: 'src/bin/project.js'
       },
       scripts: {
         test: 'eslint && jasmine'
@@ -103,7 +103,7 @@ describe('PackageJson', function() {
     });
   });
 
-  it('adds the babel-runtime as a dependency', function() {
+  it('adds the babel-runtime as a dependency', () => {
     expect(
       new PackageJson({
         name: 'project'
