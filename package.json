@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "babel": "^5.8.21",
-    "node-promise-es6": "^0.0.5",
+    "node-promise-es6": "^0.0.6",
     "posix": "^2.0.1"
   },
   "devDependencies": {
