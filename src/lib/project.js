@@ -1,16 +1,29 @@
 import Directory from './directory';
 import PackageJson from '../lib/package-json';
 
-const babelRegisterPath = require.resolve('babel/register');
-const babelRegister = `var babelRegisterPath = '${babelRegisterPath}';
-try { babelRegisterPath = require.resolve('babel/register');  } catch (e) {}
-require(babelRegisterPath)({stage: 0});`;
+function binAdapter(packageDir, binPath, babel = true) {
+  if (!babel) {
+    return `#!/usr/bin/env node
+'use strict';
+require('${packageDir.join(binPath)}');
+`;
+  }
 
-function binAdapter(jsFilePath, babel = true) {
   return `#!/usr/bin/env node
 'use strict';
-${babel ? babelRegister : ''}
-require('${jsFilePath}');
+[
+  '${packageDir.join('node_modules/babel/register.js')}',
+  'babel/register',
+  '${require.resolve('babel/register')}'
+].some(function(babelRegisterPath) {
+  try {
+    require(babelRegisterPath)({stage: 0});
+    return true;
+  } catch(e) {
+    return false;
+  }
+});
+require('${packageDir.join(binPath)}');
 `;
 }
 
@@ -61,7 +74,8 @@ export default class Project {
         await bin.writeFile(
           binName,
           binAdapter(
-            packageDir.join(binPath),
+            packageDir,
+            binPath,
             binContents.indexOf('#!/usr/bin/env node') !== 0
           )
         );
