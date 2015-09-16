@@ -28,7 +28,7 @@
   "dependencies": {
     "babel": "^5.8.23",
     "node-promise-es6": "^0.0.6",
-    "posix": "^2.0.1"
+    "posix": "^4.0.0"
   },
   "devDependencies": {
     "eslint-defaults": "^0.1.3",
