@@ -31,7 +31,7 @@
     "posix": "^4.0.0"
   },
   "devDependencies": {
-    "eslint-defaults": "^0.1.3",
+    "eslint-defaults": "^0.1.4",
     "jasmine-es6": "^0.0.18"
   }
 }
