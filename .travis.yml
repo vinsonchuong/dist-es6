@@ -10,3 +10,5 @@ addons:
       - g++-4.8
 before_install:
   - export CXX='g++-4.8'
+  - npm install -g npm
+  - echo "$(which npm)"
