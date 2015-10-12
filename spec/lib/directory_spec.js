@@ -1,5 +1,5 @@
 import path from 'path';
-import fs from 'node-promise-es6/fs';
+import {fs} from 'node-promise-es6';
 import Directory from 'dist-es6/lib/directory';
 
 describe('Directory', () => {

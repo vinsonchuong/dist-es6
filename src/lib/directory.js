@@ -1,6 +1,6 @@
 import path from 'path';
-import fs from 'node-promise-es6/fs';
-import {exec} from 'node-promise-es6/child-process';
+import {fs, childProcess} from 'node-promise-es6';
+import * as fse from 'fs-extra-promise-es6';
 
 export default class Directory {
   constructor(...directoryPath) {
@@ -16,12 +16,12 @@ export default class Directory {
   }
 
   async execSh(command) {
-    const child = await exec(command, {cwd: this.path});
+    const child = await childProcess.exec(command, {cwd: this.path});
     return child.stdout.trim();
   }
 
   async execNode(code) {
-    const child = await exec(`node -e 'console.log(eval(process.env.code))'`, {
+    const child = await childProcess.exec(`node -e 'console.log(eval(process.env.code))'`, {
       cwd: this.path,
       env: Object.assign({}, process.env, {code})
     });
@@ -48,12 +48,12 @@ export default class Directory {
     const childFileContents = typeof contents === 'object' ?
       JSON.stringify(contents) :
       contents;
-    await fs.remove(childFilePath);
+    await fse.remove(childFilePath);
     await fs.writeFile(childFilePath, childFileContents);
   }
 
   async cp(sourcePath, name) {
-    await fs.copy(path.resolve(sourcePath), this.join(name));
+    await fse.copy(path.resolve(sourcePath), this.join(name));
   }
 
   async mkdir(childDirectoryName) {
@@ -68,12 +68,12 @@ export default class Directory {
   }
 
   async rm(childName = '') {
-    await fs.remove(this.join(childName));
+    await fse.remove(this.join(childName));
   }
 
   async symlink(sourcePath, name) {
     const destinationPath = this.join(name);
-    await fs.remove(destinationPath);
+    await fse.remove(destinationPath);
     await fs.symlink(path.resolve(sourcePath), destinationPath);
   }
 }
