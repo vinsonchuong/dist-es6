@@ -59,7 +59,7 @@ describe('Project', () => {
       await srcDirectory.writeFile(
         'bin-file.js',
         `#!/usr/bin/env node
-        require('babel/register')({stage: 0});
+        require('babel-core/register')({presets: ['es2015', 'stage-0']});
         console.log('linked-bin')`
       );
       await srcDirectory.writeFile(
@@ -254,7 +254,7 @@ describe('Project', () => {
         },
         dependencies: {
           'foo': '1.0.0',
-          'babel-runtime': `<= ${require('babel/package.json').version}`
+          'babel-runtime': `^${require('babel/package.json').version}`
         }
       });
     });
@@ -290,8 +290,6 @@ describe('Project', () => {
       await srcDirectory.writeFile(
         'main.js',
         `
-          const nums = [1, 2, 3];
-          export const x2 = [for (x of nums) 2 * x];
           export async function fn() {}
           export default 'main code';
         `
@@ -323,9 +321,8 @@ describe('Project', () => {
       await binDirectory.writeFile(
         'bin-file.js',
         `
-          const nums = [1, 2, 3];
-          export const numsX2 = [for (x of nums) 2 * x];
-          console.log(numsX2.join(', '));
+          export async function fn() {}
+          export default 'main code';
         `
       );
 

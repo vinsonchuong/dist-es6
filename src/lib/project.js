@@ -11,18 +11,7 @@ require('${packageDir.join(binPath)}');
 
   return `#!/usr/bin/env node
 'use strict';
-[
-  '${packageDir.join('node_modules/babel/register.js')}',
-  'babel/register',
-  '${require.resolve('babel/register')}'
-].some(function(babelRegisterPath) {
-  try {
-    require(babelRegisterPath)({stage: 0});
-    return true;
-  } catch(e) {
-    return false;
-  }
-});
+require('babel-core/register')({presets: ['es2015', 'stage-0']});
 require('${packageDir.join(binPath)}');
 `;
 }
@@ -41,10 +30,10 @@ export default class Project {
 
   async link(packagePath) {
     const packageDir = new Directory(packagePath);
-    const [packageJson, nodeModules] = await* [
+    const [packageJson, nodeModules] = await Promise.all([
       packageDir.readFile('package.json'),
       this.directory.mkdir('node_modules')
-    ];
+    ]);
 
     if (packagePath !== this.directory.path) {
       const installedPackages = await nodeModules.ls();
@@ -63,11 +52,11 @@ export default class Project {
       }
     }
 
-    const [bin] = await* [
-      await nodeModules.mkdir('.bin'),
+    const [bin] = await Promise.all([
+      nodeModules.mkdir('.bin'),
       nodeModules.symlink(packageDir.join('src'), packageJson.name)
-    ];
-    await* Object.keys(Object(packageJson.bin))
+    ]);
+    await Promise.all(Object.keys(Object(packageJson.bin))
       .map(async binName => {
         const binPath = packageJson.bin[binName];
         const binContents = await packageDir.readFile(binPath);
@@ -80,7 +69,7 @@ export default class Project {
           )
         );
         await bin.chmod(binName, '755');
-      });
+      }));
   }
 
   async linkAll() {
@@ -104,15 +93,17 @@ export default class Project {
 
     await distDirectory.writeFile('package.json', distPackageJson);
 
-    await* (packageJson.files || [])
+    await Promise.all(
+      (packageJson.files || [])
       .filter(fileName => fileName.indexOf('src') !== 0)
-      .map(fileName => distDirectory.cp(this.directory.join(fileName), fileName));
+      .map(fileName => distDirectory.cp(this.directory.join(fileName), fileName))
+    );
 
     await this.directory.mkdir('src');
     await this.directory.execSh([
-      `'${require.resolve('babel/bin/babel')}'`,
-      '--stage 0',
-      '--optional runtime',
+      `'${require.resolve('babel-cli/bin/babel')}'`,
+      '--presets es2015,stage-0',
+      '--plugins transform-runtime',
       '--copy-files',
       'src',
       '--out-dir dist'
@@ -120,16 +111,18 @@ export default class Project {
 
     const {bin = {}} = distPackageJson;
     const shebang = '#!/usr/bin/env node';
-    await* Object.keys(bin).map(async binName => {
-      const binPath = bin[binName];
-      const binContents = await distDirectory.readFile(binPath);
-      await distDirectory.writeFile(
-        binPath,
-        binContents.indexOf(shebang) !== 0 ?
-          `${shebang}\n${binContents}` :
-          binContents
-      );
-      await distDirectory.chmod(binPath, '755');
-    });
+    await Promise.all(
+      Object.keys(bin).map(async binName => {
+        const binPath = bin[binName];
+        const binContents = await distDirectory.readFile(binPath);
+        await distDirectory.writeFile(
+          binPath,
+          binContents.indexOf(shebang) !== 0 ?
+            `${shebang}\n${binContents}` :
+            binContents
+        );
+        await distDirectory.chmod(binPath, '755');
+      })
+    );
   }
 }
