@@ -321,8 +321,10 @@ describe('Project', () => {
       await binDirectory.writeFile(
         'bin-file.js',
         `
-          export async function fn() {}
-          export default 'main code';
+          async function fn() {
+            console.log('1, 2, 3');
+          }
+          fn();
         `
       );
 
@@ -341,7 +343,7 @@ describe('Project', () => {
       });
       await userDirectory.execSh('npm install');
       expect(await userDirectory.execSh('npm run bin-name'))
-        .toContain('2, 4, 6');
+        .toContain('1, 2, 3');
     }, 60000);
   });
 });
