@@ -70,9 +70,12 @@ export default class PackageJson {
   }
 
   addBabelRuntime() {
+    const [, runtimeVersion] = require('babel/package.json').version
+      .match(/^(\d+\.\d+)\.\d+$/);
+
     return this.map({
       dependencies: Object.assign({}, this.packageJson.dependencies, {
-        'babel-runtime': `^${require('babel/package.json').version}`
+        'babel-runtime': `^${runtimeVersion}`
       })
     });
   }

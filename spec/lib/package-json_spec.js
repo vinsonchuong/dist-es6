@@ -104,6 +104,9 @@ describe('PackageJson', () => {
   });
 
   it('adds the babel-runtime as a dependency', () => {
+    const [, runtimeVersion] = require('babel/package.json').version
+      .match(/^(\d+\.\d+)\.\d+$/);
+
     expect(
       new PackageJson({
         name: 'project'
@@ -111,7 +114,7 @@ describe('PackageJson', () => {
     ).toEqual({
       name: 'project',
       dependencies: {
-        'babel-runtime': `^${require('babel/package.json').version}`
+        'babel-runtime': `^${runtimeVersion}`
       }
     });
 
@@ -126,7 +129,7 @@ describe('PackageJson', () => {
       name: 'project',
       dependencies: {
         'foo-bar': '1.0.0',
-        'babel-runtime': `^${require('babel/package.json').version}`
+        'babel-runtime': `^${runtimeVersion}`
       }
     });
   });

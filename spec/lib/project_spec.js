@@ -245,6 +245,9 @@ describe('Project', () => {
       const project = new Project('project');
       await project.compile();
 
+      const [, runtimeVersion] = require('babel/package.json').version
+        .match(/^(\d+\.\d+)\.\d+$/);
+
       const distDirectory = await projectDirectory.mkdir('dist');
       expect(await distDirectory.readFile('package.json')).toEqual({
         name: 'project',
@@ -254,7 +257,7 @@ describe('Project', () => {
         },
         dependencies: {
           'foo': '1.0.0',
-          'babel-runtime': `^${require('babel/package.json').version}`
+          'babel-runtime': `^${runtimeVersion}`
         }
       });
     });
