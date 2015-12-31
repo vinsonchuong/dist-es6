@@ -60,11 +60,15 @@ describe('Project', () => {
         'bin-file.js',
         `#!/usr/bin/env node
         require('babel-core/register')({presets: ['es2015', 'stage-0']});
-        console.log('linked-bin')`
+        console.log('linked-bin');`
       );
       await srcDirectory.writeFile(
         'es6-bin-file.js',
-        `const {text} = {text: 'es6 bin'}; console.log(text)`
+        `
+        const {text} = {text: 'es6 bin'};
+        async function fn() {}
+        console.log(text);
+        `
       );
 
       const project = new Project(projectDirectory.path);

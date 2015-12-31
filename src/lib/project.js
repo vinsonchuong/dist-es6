@@ -11,7 +11,10 @@ require('${packageDir.join(binPath)}');
 
   return `#!/usr/bin/env node
 'use strict';
-require('babel-core/register')({presets: ['es2015', 'stage-0']});
+require('babel-core/register')({
+  presets: ['es2015', 'stage-0'],
+  plugins: ['transform-runtime']
+});
 require('${packageDir.join(binPath)}');
 `;
 }
