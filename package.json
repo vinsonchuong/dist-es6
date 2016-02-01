@@ -15,7 +15,8 @@
     "src"
   ],
   "bin": {
-    "dist-es6": "src/bin/dist-es6.js"
+    "dist-es6": "src/bin/dist-es6.js",
+    "dist-es6-bootstrap": "src/bin/dist-es6-bootstrap.js"
   },
   "repository": {
     "type": "git",
