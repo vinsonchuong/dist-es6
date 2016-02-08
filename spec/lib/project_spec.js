@@ -59,7 +59,7 @@ describe('Project', () => {
       await srcDirectory.writeFile(
         'bin-file.js',
         `#!/usr/bin/env node
-        require('babel-core/register')({presets: ['es2015', 'stage-0']});
+        require('babel-register')({presets: ['es2015', 'stage-0']});
         console.log('linked-bin');`
       );
       await srcDirectory.writeFile(

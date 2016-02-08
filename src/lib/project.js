@@ -11,7 +11,7 @@ require('${packageDir.join(binPath)}');
 
   return `#!/usr/bin/env node
 'use strict';
-require('babel-core/register')({
+require('babel-register')({
   presets: ['es2015', 'stage-0'],
   plugins: ['transform-runtime']
 });
