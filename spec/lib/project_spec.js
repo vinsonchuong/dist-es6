@@ -67,6 +67,13 @@ describe('Project', () => {
         `
         const {text} = {text: 'es6 bin'};
         async function fn() {}
+
+        function methodDecorator() {}
+        class Foo {
+          @methodDecorator
+          method() {}
+        }
+
         console.log(text);
         `
       );
@@ -297,6 +304,11 @@ describe('Project', () => {
       await srcDirectory.writeFile(
         'main.js',
         `
+          function methodDecorator() {}
+          export class Foo {
+            @methodDecorator
+            method() {}
+          }
           export async function fn() {}
           export default 'main code';
         `
@@ -328,6 +340,11 @@ describe('Project', () => {
       await binDirectory.writeFile(
         'bin-file.js',
         `
+          function methodDecorator() {}
+          class Foo {
+            @methodDecorator
+            method() {}
+          }
           async function fn() {
             console.log('1, 2, 3');
           }

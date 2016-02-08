@@ -13,7 +13,7 @@ require('${packageDir.join(binPath)}');
 'use strict';
 require('babel-register')({
   presets: ['es2015', 'stage-0'],
-  plugins: ['transform-runtime']
+  plugins: ['transform-decorators-legacy', 'transform-runtime']
 });
 require('${packageDir.join(binPath)}');
 `;
@@ -106,7 +106,7 @@ export default class Project {
     await this.directory.execSh([
       `'${require.resolve('babel-cli/bin/babel')}'`,
       '--presets es2015,stage-0',
-      '--plugins transform-runtime',
+      '--plugins transform-decorators-legacy,transform-runtime',
       '--copy-files',
       'src',
       '--out-dir dist'
