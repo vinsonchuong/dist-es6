@@ -17,7 +17,9 @@ async function run() {
   }
 }
 
-run().catch(error => {
-  process.stderr.write(error.stack + '\n');
+run().catch((error) => {
+  process.stderr.write(`${error.stack}\n`);
+  /* eslint-disable lines-around-comment, no-process-exit */
   process.exit(1);
+  /* eslint-enable lines-around-comment, no-process-exit */
 });

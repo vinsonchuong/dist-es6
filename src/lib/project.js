@@ -42,8 +42,8 @@ export default class Project {
       const installedPackages = await nodeModules.ls();
       const {dependencies = {}} = packageJson;
       const installArgs = Object.keys(dependencies)
-        .filter(name => installedPackages.indexOf(name) === -1)
-        .map(name => `'${name}@${dependencies[name]}'`)
+        .filter((name) => installedPackages.indexOf(name) === -1)
+        .map((name) => `'${name}@${dependencies[name]}'`)
         .join(' ');
       if (installArgs.trim()) {
         const output = await this.directory.execSh(
@@ -60,7 +60,7 @@ export default class Project {
       nodeModules.symlink(packageDir.join('src'), packageJson.name)
     ]);
     await Promise.all(Object.keys(Object(packageJson.bin))
-      .map(async binName => {
+      .map(async (binName) => {
         const binPath = packageJson.bin[binName];
         const binContents = await packageDir.readFile(binPath);
         await bin.writeFile(
@@ -98,8 +98,8 @@ export default class Project {
 
     await Promise.all(
       (packageJson.files || [])
-      .filter(fileName => fileName.indexOf('src') !== 0)
-      .map(fileName => distDirectory.cp(this.directory.join(fileName), fileName))
+      .filter((fileName) => fileName.indexOf('src') !== 0)
+      .map((fileName) => distDirectory.cp(this.directory.join(fileName), fileName))
     );
 
     await this.directory.mkdir('src');
@@ -115,14 +115,14 @@ export default class Project {
     const {bin = {}} = distPackageJson;
     const shebang = '#!/usr/bin/env node';
     await Promise.all(
-      Object.keys(bin).map(async binName => {
+      Object.keys(bin).map(async (binName) => {
         const binPath = bin[binName];
         const binContents = await distDirectory.readFile(binPath);
         await distDirectory.writeFile(
           binPath,
-          binContents.indexOf(shebang) !== 0 ?
-            `${shebang}\n${binContents}` :
-            binContents
+          binContents.indexOf(shebang) === 0 ?
+            binContents :
+            `${shebang}\n${binContents}`
         );
         await distDirectory.chmod(binPath, '755');
       })

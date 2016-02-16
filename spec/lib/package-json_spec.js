@@ -104,8 +104,10 @@ describe('PackageJson', () => {
   });
 
   it('adds the babel-runtime as a dependency', () => {
+    /* eslint-disable lines-around-comment, global-require */
     const [, runtimeVersion] = require('babel/package.json').version
       .match(/^(\d+\.\d+)\.\d+$/);
+    /* eslint-enable lines-around-comment, global-require */
 
     expect(
       new PackageJson({

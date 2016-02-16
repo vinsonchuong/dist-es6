@@ -42,10 +42,14 @@ export default class PackageJson {
       return mapper(value);
     }
 
-    const overrides = mapObj((subMapper, subKey) =>
-      typeof subMapper === 'function' ?
-        this.map(subMapper, subKey) :
-        subMapper,
+    const overrides = mapObj(
+      (subMapper, subKey) => {
+        if (typeof subMapper === 'function') {
+          return this.map(subMapper, subKey);
+        }
+
+        return subMapper;
+      },
       mapper
     );
     return new PackageJson(Object.assign({}, this.packageJson, overrides));
@@ -65,13 +69,20 @@ export default class PackageJson {
   toProduction() {
     return this.map({
       files: null,
-      scripts: (value, key) => key === 'prepublish' ? null : value
+      scripts: (value, key) => {
+        if (key === 'prepublish') {
+          return null;
+        }
+        return value;
+      }
     });
   }
 
   addBabelRuntime() {
+    /* eslint-disable lines-around-comment, global-require */
     const [, runtimeVersion] = require('babel/package.json').version
       .match(/^(\d+\.\d+)\.\d+$/);
+    /* eslint-enable lines-around-comment, global-require */
 
     return this.map({
       dependencies: Object.assign({}, this.packageJson.dependencies, {

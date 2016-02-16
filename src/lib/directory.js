@@ -21,7 +21,7 @@ export default class Directory {
   }
 
   async execNode(code) {
-    const child = await childProcess.exec(`node -e 'console.log(eval(process.env.code))'`, {
+    const child = await childProcess.exec("node -e 'console.log(eval(process.env.code))'", {
       cwd: this.path,
       env: Object.assign({}, process.env, {code})
     });

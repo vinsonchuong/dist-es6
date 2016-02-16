@@ -27,13 +27,13 @@ describe('Project', () => {
       const srcDirectory = await linkedDirectory.mkdir('src');
       await srcDirectory.writeFile(
         'index.js',
-        `module.exports = 'linked package'`
+        "module.exports = 'linked package'"
       );
 
       const project = new Project(projectDirectory.path);
       await project.link(linkedDirectory.path);
 
-      expect(await projectDirectory.execNode(`require('linked')`))
+      expect(await projectDirectory.execNode("require('linked')"))
         .toBe('linked package');
     });
 
@@ -81,10 +81,10 @@ describe('Project', () => {
       const project = new Project(projectDirectory.path);
       await project.link(linkedDirectory.path);
 
-      const binOutput = await projectDirectory.execSh(`npm run linked-bin`);
+      const binOutput = await projectDirectory.execSh('npm run linked-bin');
       expect(binOutput.split('\n').slice(-1)[0]).toBe('linked-bin');
 
-      const es6BinOutput = await projectDirectory.execSh(`npm run es6-bin`);
+      const es6BinOutput = await projectDirectory.execSh('npm run es6-bin');
       expect(es6BinOutput.split('\n').slice(-1)[0]).toBe('es6 bin');
     });
 
@@ -129,13 +129,13 @@ describe('Project', () => {
       const srcDirectory = await linkedDirectory.mkdir('src');
       await srcDirectory.writeFile(
         'bin-file.js',
-        `const {name} = {name: 'linked-bin'}; console.log(name)`
+        "const {name} = {name: 'linked-bin'}; console.log(name)"
       );
 
       const project = new Project(projectDirectory.path);
       await project.link(linkedDirectory.path);
 
-      const output = await projectDirectory.execSh(`npm run linked-bin`);
+      const output = await projectDirectory.execSh('npm run linked-bin');
       expect(output.split('\n').slice(-1)[0]).toBe('linked-bin');
     });
 
@@ -159,12 +159,12 @@ describe('Project', () => {
       const srcDirectory = await linkedDirectory.mkdir('src');
       srcDirectory.writeFile(
         'index.js',
-        `module.exports = 'linked package'`
+        "module.exports = 'linked package'"
       );
       const libDirectory = await srcDirectory.mkdir('lib');
       await libDirectory.writeFile(
         'lib.js',
-        `module.exports = 'lib code'`
+        "module.exports = 'lib code'"
       );
       const binDirectory = await srcDirectory.mkdir('bin');
       await binDirectory.writeFile(
@@ -175,12 +175,12 @@ describe('Project', () => {
       const project = new Project(projectDirectory.path);
       await project.link(linkedDirectory.path, 'src');
 
-      expect(await projectDirectory.execNode(`require('linked')`))
+      expect(await projectDirectory.execNode("require('linked')"))
         .toBe('linked package');
-      expect(await projectDirectory.execNode(`require('linked/lib/lib')`))
+      expect(await projectDirectory.execNode("require('linked/lib/lib')"))
         .toBe('lib code');
 
-      const output = await projectDirectory.execSh(`npm run linked-bin`);
+      const output = await projectDirectory.execSh('npm run linked-bin');
       expect(output.split('\n').slice(-1)[0]).toBe('linked-bin');
     });
 
@@ -194,7 +194,7 @@ describe('Project', () => {
       const linkedSrcDirectory = await linkedDirectory.mkdir('src');
       await linkedSrcDirectory.writeFile(
         'index.js',
-        `module.exports = 'link dependency main'`
+        "module.exports = 'link dependency main'"
       );
 
       const projectDirectory = await rootDirectory.mkdir('project');
@@ -208,13 +208,13 @@ describe('Project', () => {
       const srcDirectory = await projectDirectory.mkdir('src');
       await srcDirectory.writeFile(
         'index.js',
-        `module.exports = require('linked')`
+        "module.exports = require('linked')"
       );
       const project = new Project('project');
 
       await project.linkAll();
 
-      expect(await projectDirectory.execNode(`require('project')`))
+      expect(await projectDirectory.execNode("require('project')"))
         .toBe('link dependency main');
     });
   });
@@ -256,8 +256,10 @@ describe('Project', () => {
       const project = new Project('project');
       await project.compile();
 
+      /* eslint-disable lines-around-comment, global-require */
       const [, runtimeVersion] = require('babel/package.json').version
         .match(/^(\d+\.\d+)\.\d+$/);
+      /* eslint-enable lines-around-comment, global-require */
 
       const distDirectory = await projectDirectory.mkdir('dist');
       expect(await distDirectory.readFile('package.json')).toEqual({
@@ -319,7 +321,7 @@ describe('Project', () => {
 
       const distDirectory = await projectDirectory.mkdir('dist');
       await distDirectory.execSh('npm install');
-      expect(await distDirectory.execNode(`require('./').default`))
+      expect(await distDirectory.execNode("require('./').default"))
         .toBe('main code');
       expect(await distDirectory.readFile('main.js'))
         .toContain('babel-runtime');
