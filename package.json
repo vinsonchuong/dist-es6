@@ -1,6 +1,6 @@
 {
   "name": "dist-es6",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Utilities to support development of npm packages in ES6+",
   "keywords": [
     "es6"
