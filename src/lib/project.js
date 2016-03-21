@@ -11,7 +11,7 @@ require('${packageDir.join(binPath)}');
 
   return `#!/usr/bin/env node
 'use strict';
-require('dist-es6/lib/run')('${packageDir.join(binPath)}');
+require('dist-es6/lib/run').module('${packageDir.join(binPath)}');
 `;
 }
 

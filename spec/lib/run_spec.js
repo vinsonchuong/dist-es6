@@ -12,7 +12,7 @@ describe('run', () => {
 
     await fs.mkdir(projectPath);
     await fs.writeFile(path.join(projectPath, 'bin.js'), `
-      require('dist-es6/lib/run')('${path.join(projectPath, 'lib.js')}');
+      require('dist-es6/lib/run').module('${path.join(projectPath, 'lib.js')}');
     `);
     await fs.writeFile(path.join(projectPath, 'lib.js'), `
       import * as path from 'path';
