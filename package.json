@@ -41,6 +41,6 @@
   },
   "devDependencies": {
     "eslint-defaults": "^0.2.4",
-    "jasmine-es6": "^0.1.6"
+    "jasmine-es6": "^0.1.7"
   }
 }
