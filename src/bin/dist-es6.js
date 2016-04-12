@@ -12,8 +12,8 @@ async function run() {
     if (output.trim()) {
       process.stdout.write(`${output.trim()}\n`);
     }
-    process.kill(posix.getppid());
     await project.directory.rm('dist');
+    process.kill(posix.getppid());
   }
 }
 
