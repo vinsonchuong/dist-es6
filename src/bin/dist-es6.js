@@ -1,4 +1,3 @@
-import posix from 'posix';
 import Project from '../lib/project';
 
 async function run() {
@@ -13,7 +12,7 @@ async function run() {
       process.stdout.write(`${output.trim()}\n`);
     }
     await project.directory.rm('dist');
-    process.kill(posix.getppid());
+    process.kill(await project.directory.execSh('pgrep npm'));
   }
 }
 
