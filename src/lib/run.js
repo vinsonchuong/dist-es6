@@ -1,11 +1,8 @@
-const path = require('path');
-
-const linkedPath = path.resolve('node_modules', path.basename(path.resolve()));
 const babelOptions = {
   presets: ['es2015', 'stage-0'],
   plugins: ['transform-decorators-legacy', 'transform-runtime'],
-  ignore: (filePath) => filePath.indexOf('node_modules') > -1 &&
-    filePath.indexOf(linkedPath) === -1
+  ignore: (filePath) => filePath.indexOf('node_modules') !== -1 &&
+    !filePath.match(/([^/]+)\/node_modules\/\1/)
 };
 
 exports.module = function runModule(modulePath) {
