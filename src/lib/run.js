@@ -1,8 +1,7 @@
 const babelOptions = {
   presets: ['es2015', 'stage-0'],
   plugins: ['transform-decorators-legacy', 'transform-runtime'],
-  ignore: (filePath) => filePath.indexOf('node_modules') !== -1 &&
-    !filePath.match(/([^/]+)\/node_modules\/\1/)
+  ignore: [/(?=\/[^\/]+\/node_modules)\/([^\/]+)\/node_modules\/(?!\1\/)/]
 };
 
 exports.module = function runModule(modulePath) {
