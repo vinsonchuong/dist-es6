@@ -70,10 +70,4 @@ export default class Directory {
   async rm(childName = '') {
     await fse.remove(this.join(childName));
   }
-
-  async symlink(sourcePath, name) {
-    const destinationPath = this.join(name);
-    await fse.remove(destinationPath);
-    await fs.symlink(path.resolve(sourcePath), destinationPath);
-  }
 }

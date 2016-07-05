@@ -3,10 +3,9 @@
 
 Utilities to support development of npm packages in ES6+.
 
-While developing, `dist-es6` symlinks your package into itself so that you can
-import files by module name as a user of your package would, instead of having
-to figure out relative paths. `dist-es6` also adds a new field
-`linkDependencies` to `package.json`, which provides automatic package linking.
+While developing, `dist-es6` modifies the Node.js module search path so that you
+can import files by module name as a user of your package would, instead of
+having to figure out relative paths.
 
 When you're ready to publish your package, `dist-es6` compiles ES6+ code from
 the `src` directory, copies the `package.json`, and copies other whitelisted
@@ -65,32 +64,6 @@ via module path instead of relative path:
 import code from 'project/lib/code';
 ```
 
-Dependencies on local packages for development can be listed as follows:
-
-```json
-{
-  "name": "project",
-  "main": "src/index.js",
-  "bin": {
-    "project": "src/bin/project.js"
-  },
-  "scripts": {
-    "prepublish": "dist-es6"
-  },
-  "linkDependencies": {
-    "common-lib": "../common-lib"
-  }
-}
-```
-
-Packages listed in `linkDependencies` should be removed from `devDependencies`.
-
-Note that runtime dependencies of any link dependencies will be installed
-directly in the project that declares the link dependencies. In other words,
-if two link dependencies depend on different versions of a package, only one of
-the versions will be installed. So, please ensure that all link dependencies
-depend on compatible versions of any overlapping dependencies.
-
 For publishing, files outside of the `src` directory that need to be published
 must be whitelisted in the `files` field as follows:
 
@@ -105,9 +78,6 @@ must be whitelisted in the `files` field as follows:
   "scripts": {
     "prepublish": "dist-es6"
   },
-  "linkDependencies": {
-    "common-lib": "../common-lib"
-  }
 }
 ```
 

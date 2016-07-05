@@ -8,214 +8,64 @@ describe('Project', () => {
       .toEqual(await new Directory().readFile('package.json'));
   });
 
-  describe('linking local packages', () => {
+  describe('creating bin adapters for the project', () => {
     afterEach(async () => {
       await new Directory().rm('project');
-      await new Directory().rm('linked');
     });
 
-    it('links a package into a project', async () => {
-      const projectDirectory = await new Directory().mkdir('project');
-      await projectDirectory.writeFile('package.json', {
-        name: 'project'
-      });
-
-      const linkedDirectory = await new Directory().mkdir('linked');
-      await linkedDirectory.writeFile('package.json', {
-        name: 'linked'
-      });
-      const srcDirectory = await linkedDirectory.mkdir('src');
-      await srcDirectory.writeFile(
-        'index.js',
-        "module.exports = 'linked package'"
-      );
-
-      const project = new Project(projectDirectory.path);
-      await project.link(linkedDirectory.path);
-
-      expect(await projectDirectory.execNode("require('linked')"))
-        .toBe('linked package');
-    });
-
-    it('also links any executables provided by the package', async () => {
+    it('creates adapters for each executable', async () => {
       const projectDirectory = await new Directory().mkdir('project');
       await projectDirectory.writeFile('package.json', {
         name: 'project',
-        scripts: {
-          'linked-bin': 'bin-name',
-          'es6-bin': 'es6-bin'
-        }
-      });
-
-      const linkedDirectory = await new Directory().mkdir('linked');
-      await linkedDirectory.writeFile('package.json', {
-        name: 'linked',
         bin: {
-          'bin-name': 'src/bin-file.js',
-          'es6-bin': 'src/es6-bin-file.js'
-        }
-      });
-      const srcDirectory = await linkedDirectory.mkdir('src');
-      await srcDirectory.writeFile(
-        'bin-file.js',
-        `#!/usr/bin/env node
-        require('babel-register')({presets: ['es2015', 'stage-0']});
-        console.log('linked-bin');`
-      );
-      await srcDirectory.writeFile(
-        'es6-bin-file.js',
-        `
-        const {text} = {text: 'es6 bin'};
-        async function fn() {}
-
-        function methodDecorator() {}
-        class Foo {
-          @methodDecorator
-          method() {}
-        }
-
-        console.log(text);
-        `
-      );
-
-      const project = new Project(projectDirectory.path);
-      await project.link(linkedDirectory.path);
-
-      const binOutput = await projectDirectory.execSh('npm run linked-bin');
-      expect(binOutput.split('\n').slice(-1)[0]).toBe('linked-bin');
-
-      const es6BinOutput = await projectDirectory.execSh('npm run es6-bin');
-      expect(es6BinOutput.split('\n').slice(-1)[0]).toBe('es6 bin');
-    });
-
-    it('installs any runtime dependencies of the linked package', async () => {
-      const projectDirectory = await new Directory().mkdir('project');
-      await projectDirectory.writeFile('package.json', {
-        name: 'project'
-      });
-
-      const linkedDirectory = await new Directory().mkdir('linked');
-      await linkedDirectory.writeFile('package.json', {
-        name: 'linked',
-        dependencies: {
-          jquery: '2.1.4'
-        }
-      });
-
-      const project = new Project(projectDirectory.path);
-      await project.link(linkedDirectory.path);
-
-      expect(
-        await projectDirectory.readFile('node_modules/jquery/package.json')
-      ).toEqual(jasmine.objectContaining({version: '2.1.4'}));
-    }, 60000);
-
-    it('can link packages containing ES6 executables', async () => {
-      const projectDirectory = await new Directory().mkdir('project');
-      await projectDirectory.writeFile('package.json', {
-        name: 'project',
+          'esnext': 'src/esnext.js',
+          'es5': 'src/es5.js'
+        },
         scripts: {
-          'linked-bin': 'bin-name'
+          "esnext": "esnext",
+          "es5": "es5"
         }
       });
 
-      const linkedDirectory = await new Directory().mkdir('linked');
-      await linkedDirectory.writeFile('package.json', {
-        name: 'linked',
-        bin: {
-          'bin-name': 'src/bin-file.js'
-        }
-      });
-      const srcDirectory = await linkedDirectory.mkdir('src');
-      await srcDirectory.writeFile(
-        'bin-file.js',
-        "const {name} = {name: 'linked-bin'}; console.log(name)"
-      );
-
-      const project = new Project(projectDirectory.path);
-      await project.link(linkedDirectory.path);
-
-      const output = await projectDirectory.execSh('npm run linked-bin');
-      expect(output.split('\n').slice(-1)[0]).toBe('linked-bin');
-    });
-
-    it('can change the root directory of a linked package', async () => {
-      const projectDirectory = await new Directory().mkdir('project');
-      await projectDirectory.writeFile('package.json', {
-        name: 'project',
-        scripts: {
-          'linked-bin': 'bin-name'
-        }
-      });
-
-      const linkedDirectory = await new Directory().mkdir('linked');
-      await linkedDirectory.writeFile('package.json', {
-        name: 'linked',
-        main: 'src/index.js',
-        bin: {
-          'bin-name': 'src/bin/bin-file.js'
-        }
-      });
-      const srcDirectory = await linkedDirectory.mkdir('src');
-      srcDirectory.writeFile(
-        'index.js',
-        "module.exports = 'linked package'"
-      );
-      const libDirectory = await srcDirectory.mkdir('lib');
-      await libDirectory.writeFile(
-        'lib.js',
-        "module.exports = 'lib code'"
-      );
-      const binDirectory = await srcDirectory.mkdir('bin');
-      await binDirectory.writeFile(
-        'bin-file.js',
-        `#!/usr/bin/env node\nconsole.log('linked-bin')`
-      );
-
-      const project = new Project(projectDirectory.path);
-      await project.link(linkedDirectory.path, 'src');
-
-      expect(await projectDirectory.execNode("require('linked')"))
-        .toBe('linked package');
-      expect(await projectDirectory.execNode("require('linked/lib/lib')"))
-        .toBe('lib code');
-
-      const output = await projectDirectory.execSh('npm run linked-bin');
-      expect(output.split('\n').slice(-1)[0]).toBe('linked-bin');
-    });
-
-    it('can link packages listed in linkDependencies as well as the current package', async () => {
-      const rootDirectory = new Directory();
-
-      const linkedDirectory = await rootDirectory.mkdir('linked');
-      await linkedDirectory.writeFile('package.json', {
-        name: 'linked'
-      });
-      const linkedSrcDirectory = await linkedDirectory.mkdir('src');
-      await linkedSrcDirectory.writeFile(
-        'index.js',
-        "module.exports = 'link dependency main'"
-      );
-
-      const projectDirectory = await rootDirectory.mkdir('project');
-      await projectDirectory.writeFile('package.json', {
-        name: 'project',
-        main: 'src/index.js',
-        linkDependencies: {
-          linked: linkedDirectory.path
-        }
-      });
       const srcDirectory = await projectDirectory.mkdir('src');
       await srcDirectory.writeFile(
-        'index.js',
-        "module.exports = require('linked')"
+        'lib.js',
+        `
+        import * as path from 'path';
+        export default function() {
+          return path.resolve();
+        }
+        `
+      )
+      await srcDirectory.writeFile(
+        'esnext.js',
+        `
+        import lib from 'project/src/lib';
+
+        function classDecorator() {}
+
+        @classDecorator
+        class Foo {}
+
+        process.stdout.write(lib());`
       );
+      await srcDirectory.writeFile(
+        'es5.js',
+        [
+          '#!/usr/bin/env node',
+          "require('babel-register')({presets: ['es2015', 'stage-0']});",
+          "process.stdout.write('es5');"
+        ].join('\n')
+      );
+
       const project = new Project('project');
+      await project.linkBins();
 
-      await project.linkAll();
+      const esnextOutput = await projectDirectory.execSh('npm run esnext');
+      expect(esnextOutput.split('\n').slice(-1)[0]).toBe(projectDirectory.path);
 
-      expect(await projectDirectory.execNode("require('project')"))
-        .toBe('link dependency main');
+      const es5Output = await projectDirectory.execSh('npm run es5');
+      expect(es5Output.split('\n').slice(-1)[0]).toBe('es5');
     });
   });
 

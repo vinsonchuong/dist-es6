@@ -116,13 +116,6 @@ describe('Directory', () => {
       expect(await directory.readFile('child-file')).toBe('other text');
     });
 
-    it('overwrites any existing symlink with the same name', async () => {
-      const directory = new Directory('directory');
-      await directory.symlink('node_modules', 'child-file');
-      await directory.writeFile('child-file', 'text');
-      expect(await directory.readFile('child-file')).toBe('text');
-    });
-
     it('overwrites any existing directory with the same name', async () => {
       const directory = new Directory('directory');
       const childDirectory = await directory.mkdir('child');
@@ -161,50 +154,6 @@ describe('Directory', () => {
 
       const copiedDirectory = await toDirectory.mkdir('copied-directory');
       expect(await copiedDirectory.readFile('file')).toBe('text');
-    });
-  });
-
-  describe('creating symlinks', () => {
-    beforeEach(async () => {
-      const projectDirectory = new Directory();
-      await projectDirectory.mkdir('directory');
-    });
-
-    afterEach(async () => {
-      await new Directory().rm('directory');
-    });
-
-    it('creates a symlink with the given name if a child file with the given name does not already exist', async () => {
-      const directory = new Directory('directory');
-      await directory.symlink('node_modules', 'child');
-      expect(await fs.readlink(directory.join('child')))
-        .toBe(path.resolve('node_modules'));
-    });
-
-    it('overwrites any existing file with the same name', async () => {
-      const directory = new Directory('directory');
-      await fs.writeFile(directory.join('child'), 'text');
-      await directory.symlink('node_modules', 'child');
-      expect(await fs.readlink(directory.join('child')))
-        .toBe(path.resolve('node_modules'));
-    });
-
-    it('overwrites any existing symlink with the same name', async () => {
-      const directory = new Directory('directory');
-      await fs.symlink(
-        path.resolve('node_modules'), directory.join('child'));
-      await directory.symlink('node_modules', 'child');
-      expect(await fs.readlink(directory.join('child')))
-        .toBe(path.resolve('node_modules'));
-    });
-
-    it('overwrites any existing directory with the same name', async () => {
-      const directory = new Directory('directory');
-      await fs.mkdir(directory.join('child'));
-      await fs.writeFile(directory.join('child/file'), 'text');
-      await directory.symlink('node_modules', 'child');
-      expect(await fs.readlink(directory.join('child')))
-        .toBe(path.resolve('node_modules'));
     });
   });
 

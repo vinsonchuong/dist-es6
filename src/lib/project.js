@@ -1,17 +1,17 @@
 import Directory from './directory';
 import PackageJson from '../lib/package-json';
 
-function binAdapter(packageDir, binPath, babel = true) {
+function binAdapter(binPath, babel = true) {
   if (!babel) {
     return `#!/usr/bin/env node
 'use strict';
-require('${packageDir.join(binPath)}');
+require('${binPath}');
 `;
   }
 
   return `#!/usr/bin/env node
 'use strict';
-require('dist-es6/lib/run').module('${packageDir.join(binPath)}');
+require('dist-es6/lib/run').module('${binPath}');
 `;
 }
 
@@ -27,56 +27,23 @@ export default class Project {
     return this.cachedPackageJson;
   }
 
-  async link(packagePath) {
-    const packageDir = new Directory(packagePath);
-    const [packageJson, nodeModules] = await Promise.all([
-      packageDir.readFile('package.json'),
-      this.directory.mkdir('node_modules')
-    ]);
+  async linkBins() {
+    const packageJson = await this.packageJson();
+    const nodeModules = await this.directory.mkdir('node_modules');
+    const bin = await nodeModules.mkdir('.bin');
 
-    if (packagePath !== this.directory.path) {
-      const installedPackages = await nodeModules.ls();
-      const {dependencies = {}} = packageJson;
-      const installArgs = Object.keys(dependencies)
-        .filter((name) => installedPackages.indexOf(name) === -1)
-        .map((name) => `'${name}@${dependencies[name]}'`)
-        .join(' ');
-      if (installArgs.trim()) {
-        const output = await this.directory.execSh(
-          `npm install ${installArgs}`
-        );
-        if (output.trim()) {
-          process.stdout.write(`${output.trim()}\n`);
-        }
-      }
-    }
-
-    const [bin] = await Promise.all([
-      nodeModules.mkdir('.bin'),
-      nodeModules.symlink(packageDir.join('src'), packageJson.name)
-    ]);
-    await Promise.all(Object.keys(Object(packageJson.bin))
-      .map(async (binName) => {
-        const binPath = packageJson.bin[binName];
-        const binContents = await packageDir.readFile(binPath);
+    await Promise.all(Object.entries(Object(packageJson.bin))
+      .map(async ([binName, binPath]) => {
+        const binContents = await this.directory.readFile(binPath);
         await bin.writeFile(
           binName,
           binAdapter(
-            packageDir,
-            binPath,
+            this.directory.join(binPath),
             binContents.indexOf('#!/usr/bin/env node') !== 0
           )
         );
         await bin.chmod(binName, '755');
       }));
-  }
-
-  async linkAll() {
-    const {linkDependencies = {}} = await this.packageJson();
-    await this.link(this.directory.path);
-    for (const name of Object.keys(linkDependencies)) {
-      await this.link(this.directory.join(linkDependencies[name]));
-    }
   }
 
   async compile() {
