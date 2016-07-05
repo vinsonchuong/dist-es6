@@ -18,12 +18,12 @@ describe('Project', () => {
       await projectDirectory.writeFile('package.json', {
         name: 'project',
         bin: {
-          'esnext': 'src/esnext.js',
-          'es5': 'src/es5.js'
+          esnext: 'src/esnext.js',
+          es5: 'src/es5.js'
         },
         scripts: {
-          "esnext": "esnext",
-          "es5": "es5"
+          esnext: 'esnext',
+          es5: 'es5'
         }
       });
 
@@ -36,7 +36,7 @@ describe('Project', () => {
           return path.resolve();
         }
         `
-      )
+      );
       await srcDirectory.writeFile(
         'esnext.js',
         `
