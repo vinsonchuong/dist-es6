@@ -40,7 +40,7 @@ describe('Project', () => {
       await srcDirectory.writeFile(
         'esnext.js',
         `
-        import lib from 'project/src/lib';
+        import lib from 'project/lib';
 
         function classDecorator() {}
 

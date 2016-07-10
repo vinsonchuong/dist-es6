@@ -1,16 +1,26 @@
 import Directory from './directory';
 import PackageJson from '../lib/package-json';
 
-function binAdapter(binPath, babel = true) {
+function binAdapter(packageJson, packagePath, binPath, babel = true) {
   if (!babel) {
     return `#!/usr/bin/env node
 'use strict';
+require('register-module')({
+  name: ${JSON.stringify(packageJson.name)},
+  path: ${JSON.stringify(packagePath)},
+  main: ${JSON.stringify(packageJson.main || 'index.js')}
+});
 require('${binPath}');
 `;
   }
 
   return `#!/usr/bin/env node
 'use strict';
+require('register-module')({
+  name: ${JSON.stringify(packageJson.name)},
+  path: ${JSON.stringify(packagePath)},
+  main: ${JSON.stringify(packageJson.main || 'index.js')}
+});
 require('dist-es6/lib/run').module('${binPath}');
 `;
 }
@@ -38,6 +48,8 @@ export default class Project {
         await bin.writeFile(
           binName,
           binAdapter(
+            packageJson,
+            this.directory.join('src'),
             this.directory.join(binPath),
             binContents.indexOf('#!/usr/bin/env node') !== 0
           )

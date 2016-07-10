@@ -1,5 +1,3 @@
-const path = require('path');
-
 const babelOptions = {
   presets: ['es2015', 'stage-0'],
   plugins: ['transform-decorators-legacy', 'transform-runtime'],
@@ -8,7 +6,6 @@ const babelOptions = {
 
 exports.module = function runModule(modulePath) {
   /* eslint-disable lines-around-comment, global-require */
-  require('set-node-path')(path.resolve('../'));
   require('babel-register')(babelOptions);
   require(modulePath);
   /* eslint-enable lines-around-comment, global-require */
