@@ -11,6 +11,9 @@ describe('run', () => {
     const projectPath = path.resolve('project');
 
     await fs.mkdir(projectPath);
+    await fs.writeFile(path.join(projectPath, 'package.json'), JSON.stringify({
+      name: 'project'
+    }));
     await fs.writeFile(path.join(projectPath, 'bin.js'), `
       require('dist-es6/lib/run').module('${path.join(projectPath, 'lib.js')}');
     `);

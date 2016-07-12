@@ -1,3 +1,5 @@
+const path = require('path');
+
 const babelOptions = {
   presets: ['es2015', 'stage-0'],
   plugins: ['transform-decorators-legacy', 'transform-runtime'],
@@ -6,6 +8,12 @@ const babelOptions = {
 
 exports.module = function runModule(modulePath) {
   /* eslint-disable lines-around-comment, global-require */
+  const packageJson = require(path.resolve('package.json'));
+  require('register-module')({
+    name: packageJson.name,
+    path: path.resolve('src'),
+    main: packageJson.main || 'index.js'
+  });
   require('babel-register')(babelOptions);
   require(modulePath);
   /* eslint-enable lines-around-comment, global-require */

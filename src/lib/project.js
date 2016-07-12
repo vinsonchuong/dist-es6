@@ -16,11 +16,6 @@ require('${binPath}');
 
   return `#!/usr/bin/env node
 'use strict';
-require('register-module')({
-  name: ${JSON.stringify(packageJson.name)},
-  path: ${JSON.stringify(packagePath)},
-  main: ${JSON.stringify(packageJson.main || 'index.js')}
-});
 require('dist-es6/lib/run').module('${binPath}');
 `;
 }
