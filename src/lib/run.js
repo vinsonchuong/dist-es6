@@ -11,7 +11,9 @@ exports.module = function runModule(modulePath) {
   require('register-module')({
     name: packageJson.name,
     path: path.resolve('src'),
-    main: packageJson.main || 'index.js'
+    main: packageJson.main ?
+      packageJson.main.replace('src/', '') :
+      'index.js'
   });
   require('babel-register')(babelOptions);
   require(modulePath);
