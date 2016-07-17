@@ -1,24 +1,6 @@
+import dedent from 'dedent';
 import Directory from './directory';
 import PackageJson from '../lib/package-json';
-
-function binAdapter(packageJson, packagePath, binPath, babel = true) {
-  if (!babel) {
-    return `#!/usr/bin/env node
-'use strict';
-require('register-module')({
-  name: ${JSON.stringify(packageJson.name)},
-  path: ${JSON.stringify(packagePath)},
-  main: ${JSON.stringify(packageJson.main || 'index.js')}
-});
-require('${binPath}');
-`;
-  }
-
-  return `#!/usr/bin/env node
-'use strict';
-require('dist-es6/lib/run').module('${binPath}');
-`;
-}
 
 export default class Project {
   constructor(...projectPath) {
@@ -42,12 +24,24 @@ export default class Project {
         const binContents = await this.directory.readFile(binPath);
         await bin.writeFile(
           binName,
-          binAdapter(
-            packageJson,
-            this.directory.join('src'),
-            this.directory.join(binPath),
-            binContents.indexOf('#!/usr/bin/env node') !== 0
-          )
+          dedent`
+            #!/usr/bin/env node
+            'use strict';
+            require('register-module')({
+              name: ${JSON.stringify(packageJson.name)},
+              path: ${JSON.stringify(this.directory.join('src'))},
+              main: ${JSON.stringify(
+                packageJson.main ?
+                  packageJson.main.replace('src/', '') :
+                  'index.js'
+              )}
+            });
+            ${
+              binContents.indexOf('#!/usr/bin/env node') >= 0 ?
+                'require' :
+                "require('dist-es6/lib/run').module"
+            }('${this.directory.join(binPath)}');
+          `
         );
         await bin.chmod(binName, '755');
       }));
