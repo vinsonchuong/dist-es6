@@ -1,4 +1,5 @@
 const path = require('path');
+const Module = require('module');
 
 const babelOptions = {
   presets: ['es2015', 'stage-0'],
@@ -34,7 +35,12 @@ exports.stdin = function runStdin() {
       /* eslint-disable lines-around-comment, global-require, no-underscore-dangle */
       const compiled = require('babel-core').transform(code, babelOptions);
       require('babel-register')(babelOptions);
-      module._compile(compiled.code, 'stdin');
+
+      const filename = path.resolve('stdin');
+      const mod = new Module(filename, module.parent);
+      mod.filename = filename;
+      mod.paths = Module._nodeModulePaths(path.resolve());
+      mod._compile(compiled.code, filename);
       /* eslint-enable lines-around-comment, global-require, no-underscore-dangle */
     }
   });
