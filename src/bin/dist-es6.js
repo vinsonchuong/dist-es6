@@ -4,7 +4,7 @@ async function run() {
   const project = new Project();
   const currentNpmCommand = JSON.parse(process.env.npm_config_argv).original[0];
 
-  if (currentNpmCommand === 'install') {
+  if (currentNpmCommand === 'install' || currentNpmCommand === 'i') {
     await project.linkBins();
   } else if (currentNpmCommand === 'publish') {
     await project.compile();
