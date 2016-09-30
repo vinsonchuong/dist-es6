@@ -69,7 +69,7 @@ export default class Project {
     await this.directory.mkdir('src');
     await this.directory.execSh([
       `'${require.resolve('babel-cli/bin/babel')}'`,
-      '--presets es2015,stage-0',
+      '--presets latest,stage-0',
       '--plugins transform-decorators-legacy,transform-runtime',
       '--copy-files',
       'src',

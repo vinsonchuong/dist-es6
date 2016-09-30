@@ -53,7 +53,7 @@ describe('Project', () => {
         'es5.js',
         [
           '#!/usr/bin/env node',
-          "require('babel-register')({presets: ['es2015', 'stage-0']});",
+          "require('babel-register')({presets: ['latest', 'stage-0']});",
           "process.stdout.write('es5');"
         ].join('\n')
       );

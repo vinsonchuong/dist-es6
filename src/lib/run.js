@@ -2,7 +2,7 @@ const path = require('path');
 const Module = require('module');
 
 const babelOptions = {
-  presets: ['es2015', 'stage-0'],
+  presets: ['latest', 'stage-0'],
   plugins: ['transform-decorators-legacy', 'transform-runtime']
 };
 
