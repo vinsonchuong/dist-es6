@@ -1,3 +1,7 @@
+**This project has been deprecated in favor of
+[build-esm](https://github.com/vinsonchuong/build-esm) as it is simpler and
+easier to maintain**
+
 # dist-es6
 [![Build Status](https://travis-ci.org/vinsonchuong/dist-es6.svg?branch=master)](https://travis-ci.org/vinsonchuong/dist-es6)
 
